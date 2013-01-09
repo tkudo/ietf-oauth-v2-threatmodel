@@ -232,9 +232,31 @@
       </section>
 
       <section title="Attack Assumptions">
+        <t>
+          アタッカーとリソースに関して, 以下の想定を置く.
+        </t>
+        <!--
         <t>The following assumptions relate to an attacker and resources
         available to an attacker.  It is assumed that:</t>
+        -->
 
+        <t>
+          <list style="symbols">
+            <t>
+              アタッカーはクライアントと認可サーバー, およびクライアントとリソースサーバーの間のネットワークに直接アクセス可能であり, そこでのいかなる通信も盗聴できる状態にある.
+              ただし認可サーバー・リソースサーバー間の通信へはアクセスできないものとする.
+            </t>
+            <t>
+              アタッカーが攻撃に利用するリソースに制限は無い物とする.
+            </t>
+            <t>
+              OAuthプロトコルに関与する3者のうちの2者が, 共謀して残る1者に対する攻撃を行う可能性があるものとする.
+              例えば, クライアントと認可サーバーがアタッカーの管理下にあり, リソースアクセスを得るためユーザーを騙すため共謀するケースなどが考えられる.
+            </t>
+          </list>
+        </t>
+
+        <!--
         <t><list style="symbols">
             <t>the attacker has full access to the network
             between the client and authorization servers and the client and
@@ -251,6 +273,7 @@
             of an attacker and collude to trick a user to gain access to
             resources.</t>
           </list></t>
+        -->
       </section>
 
       <section title="Architectural Assumptions">
