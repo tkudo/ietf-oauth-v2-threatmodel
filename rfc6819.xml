@@ -139,10 +139,13 @@
       <t></t>
 
       <section title="Scope">
+        <t>このドキュメントでは <xref target="RFC6749"></xref> によってサポートされるような特定のクライアントのみを対象としている. それらのクライアントは以下のような特徴を持っている:</t>
+        <!--
         <t>This security considerations document only considers clients bound
         to a particular deployment as supported by <xref
         target="RFC6749"></xref>. Such deployments have the
         following characteristics:</t>
+        -->
 
         <t><list style="symbols">
             <t>Resource server URLs are static and well-known at development
