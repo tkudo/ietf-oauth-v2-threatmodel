@@ -334,7 +334,7 @@
                 HTTPS 証明書/鍵
               </t>
               <t>
-                認可プロセスごとの "redirect_uri", "client_id" および認可 "code"
+                認可プロセスごとの "redirect_uri", "client_id" および認可コード "code"
                 (Handleベースデザイン <xref target="section_tokens"></xref> を用いる場合)
               </t>
             </list>
@@ -443,7 +443,7 @@
                 信頼された証明機関の証明書 (Trusted CA certificates, HTTPS)
               </t>
               <t>
-                認可プロセスごとの "redirect_uri", 認可 "code"
+                認可プロセスごとの "redirect_uri", 認可コード "code"
               </t>
             </list>
           </t>
@@ -727,11 +727,32 @@
       </section>
 
       <section title="Authorization &quot;code&quot;">
+        <t>
+          認可コード ("code") はエンドユーザー認可の取得に成功した結果として発行され, クライアントがアクセストークンおよびリフレッシュトークンを取得する際の中間物として動作する.
+          認可コードは以下の2つの目的で, トークンの代わりにクライアントのリダイレクトURIに送信される.
+        </t>
+        <!--
         <t>An authorization "code" represents the intermediate result of a
         successful end-user authorization process and is used by the client to
         obtain access and refresh tokens. Authorization "codes" are sent to the
         client's redirect URI instead of tokens for two purposes:</t>
+        -->
 
+        <t>
+          <list style="numbers">
+            <t>
+              ブラウザベースフローでは, プロトコルパラメーターは潜在的アタッカーにアクセス可能な状態になる.
+              ブラウザキャッシュやログファイルなどがその経路となりうる.
+              またアタッカーによって異なる値に置き換えられる可能性もある.
+              これらのリスクを軽減するため, トークンの代わりに有効期間の短い認可コードを送信し, それをよりセキュアなクライアント・認可サーバー間のダイレクト通信を通じてトークンと交換するのである.
+            </t>
+            <t>
+              クライアント認証は, ダイレクト通信ではない認可リクエストより, ダイレクト通信によって行う方が遥かに簡単である.
+              認可リクエスト時にクライアント認証を行うには, 電子署名が必要となる.
+            </t>
+          </list>
+        </t>
+        <!--
         <t><list style="numbers">
             <t>Browser-based flows expose protocol parameters to potential
             attackers via URI query parameters (HTTP referrer), the browser
@@ -746,9 +767,17 @@
             context of the indirect authorization request. The latter would
             require digital signatures.</t>
           </list></t>
+          -->
       </section>
 
       <section title="Redirect URI">
+        <t>
+          リダイレクトURIを用いることで, 不正クライアントの検知やフィッシング攻撃の防止に役立つ.
+          実際に認可リクエスト時に用いられたリダイレクトURIは, 認可コードをトークンと交換する際に提示され検証される.
+          これにより認可コードがリダイレクタを通じて偽のクライアントに漏洩した際にも, 攻撃を防ぐことができる.
+          認可サーバーはパブリッククライアントおよびimplicitグラントタイプを利用するコンフィデンシャルクライアントに対しては, リダイレクトURIの事前登録を必須とし, 認可リクエスト時に指定されるリダイレクトURIを事前登録済みのそれと比較検証するべきである.
+        </t>
+        <!--
         <t>A redirect URI helps to detect malicious clients and prevents
         phishing attacks from clients attempting to trick the user into
         believing the phisher is the client. The value of the actual
@@ -760,9 +789,17 @@
         confidential clients using the implicit grant type to pre-register
         their redirect URIs and validate against the registered
         redirect URI in the authorization request.</t>
+        -->
       </section>
 
       <section title="&quot;state&quot; Parameter">
+        <t>
+          stateパラメーターは, リクエストとそれに対するコールバックを紐づけCSRF攻撃 (<xref target="section_csrf"></xref>) を防止するために用いられる.
+          CSRF攻撃においては, アタッカーは自身のリソースへのアクセスを許可し, アタッカーに対して発行されたトークンを含むリダイレクトリクエストをユーザーに実行させる.
+          stateパラメーターはユーザーエージェントと紐付けられ, ユーザーエージェントはそれをクライアントおよびユーザーエージェントのみにアクセス可能な場所に保存する.
+          (例: same-originポリシーによって保護された場所)  
+        </t>
+        <!--
         <t>The "state" parameter is used to link requests and callbacks to
         prevent cross-site request forgery attacks (see <xref
         target="section_csrf"></xref>) where an attacker authorizes access to
@@ -772,6 +809,7 @@
         the user agent must be capable of keeping it in a location accessible
         only by the client and user agent, i.e., protected by same-origin
         policy.</t>
+        -->
       </section>
 
       <section title="Client Identifier">
