@@ -18,8 +18,7 @@
      ipr="trust200902" submissionType="IETF" consensus="yes">
 
   <front>
-    <title abbrev="OAuth 2.0 Security">OAuth 2.0 Threat Model and Security
-    Considerations</title>
+    <title abbrev="OAuth 2.0 Security">OAuth 2.0 Threat Model and Security Considerations</title>
 
     <author fullname="Torsten Lodderstedt" initials="T." role="editor"
             surname="Lodderstedt">
@@ -57,14 +56,40 @@
 <keyword>REST</keyword>
 
     <abstract>
+      <t>
+        本ドキュメントでは, OAuth 2.0仕様が定めるSecurity Considerationsの範囲を超え,
+        OAuth 2.0プロトコルに関する包括的脅威モデルを基に, さらなるセキュリティ上の検討項目を示す.
+      </t>
+      <!--
       <t>This document gives additional security considerations for OAuth,
       beyond those in the OAuth 2.0 specification, based on a comprehensive
       threat model for the OAuth 2.0 protocol.</t>
+      -->
     </abstract>
   </front>
 
   <middle>
     <section title="Introduction">
+      <t>
+        本ドキュメントでは, OAuth仕様が定めるSecurity Considerationsの範囲を超え,
+        OAuth 2.0プロトコル <xref target="RFC6749"></xref> に関する包括的脅威モデルを基に, さらなるセキュリティ上の検討項目を示す.
+        本ドキュメントは以下の項目について扱う.
+        <list style="symbols">
+          <t>
+            脅威モデル策定の前提となる仮説およびその影響範囲を定める.
+          </t>
+          <t>
+            OAuthプロトコルのセキュリティ上の特徴について述べ, それらが攻撃阻止のためにどのような役割を持つかをまとめる.
+          </t>
+          <t>
+            OAuthの包括的脅威モデル, およびそれらへの対抗策についてまとめる.
+          </t>
+        </list>
+        ここで述べる脅威には, OAuthトークンやそれによって保護されるリソースに対する意図的な攻撃の他, 適切なセキュリティ対策が施されていない場合に起こりうるセキュリティリスクも含む.
+        各脅威はプロトコル仕様の構造に基づいて整理され, デベロッパーが実装時に参照しやすく考慮されている.
+        例えば, アクセスを許可する際の脅威や各grant typeそれぞれに固有の脅威, リソースサーバーに関わる脅威などが, 該当する章・節にまとめて紹介されている.
+      </t>
+      <!--
       <t>This document gives additional security considerations for OAuth,
       beyond those in the OAuth specification, based on a comprehensive threat
       model for the OAuth 2.0 protocol <xref target="RFC6749"></xref>.
@@ -85,7 +110,17 @@
       teams implement each part of the protocol securely, for example, all
       threats for granting access, or all threats for a particular grant type,
       or all threats for protecting the resource server.</t>
+      -->
 
+      <t>
+        注)
+        本ドキュメントはそれぞれの脅威の発生確率や具体的なリスクについては述べない.
+        そういった項目は, 実装やサービス内容に大きく左右されるためである.
+        本ドキュメントは抽象的なレベルでの議論を行うが, ここで述べられる情報は実装固有の脅威モデルを考慮する際の基礎となるであろう.
+        実装者には, 抽象的な脅威モデルを実際の実装にあてはめ, リスク分析を行うことが求められる.
+        なお本ドキュメントはOAuth 2.0仕様本体を対象としており, 本ドキュメント執筆現在仕様策定が進んでいるクライアント登録やディスカバリーなどの拡張仕様については考慮しない.
+      </t>
+      <!--
       <t>Note: This document cannot assess the probability or the risk
       associated with a particular threat because those aspects strongly
       depend on the particular application and deployment OAuth is used to
@@ -97,6 +132,7 @@
       based on the base OAuth 2.0 specification, it does not consider proposed
       extensions such as client registration or discovery, many of which are
       still under discussion.</t>
+      -->
     </section>
 
     <section title="Overview">
