@@ -139,11 +139,35 @@
       <t></t>
 
       <section title="Scope">
+        <t>
+          本ドキュメントで述べられるSecurity Considerationsは, <xref target="RFC6749"></xref> の範囲内で実装されたOAuthサーバーと紐づくクライアントのみを考慮する.
+          こういった実装は以下のような特徴を持つ.
+        </t>
+        <!--
         <t>This security considerations document only considers clients bound
         to a particular deployment as supported by <xref
         target="RFC6749"></xref>. Such deployments have the
         following characteristics:</t>
+        -->
 
+        <t>
+          <list style="symbols">
+            <t>
+              リソースサーバーURLは固定で実装時に既に周知されている.
+              認可サーバーURLは固定もしくは事前に知ることができる.
+            </t>
+            <t>
+              トークンのscopeに指定される値 (アプリケーションURLやmethodなど) は, 実装時に周知されている.
+            </t>
+            <t>
+              クライアント登録は現在のCore仕様の範囲外である.
+              従って本ドキュメントはstatic/dynamicに関わらず幅広いクライアント登録方法を想定する.
+            </t>
+          </list>
+          また以下の項目は対象外とする.
+        </t>
+
+        <!--
         <t><list style="symbols">
             <t>Resource server URLs are static and well-known at development
             time; authorization server URLs can be static or discovered.</t>
@@ -156,7 +180,32 @@
             variety of options, from static registration during development
             time to dynamic registration at runtime.</t>
           </list>The following are considered out of scope:</t>
+        -->
 
+        <t>
+          <list style="symbols">
+            <t>
+              認可サーバー・リソースサーバー間のコミュニケーション.
+            </t>
+            <t>
+              トークンフォーマット.
+            </t>
+            <t>
+              認可サーバーがユーザーを認証する方式.
+              ただしリソースオーナーパスワードクレデンシャルグラント (<xref target="RFC6749"></xref> Section 4.3 参照) については対象とする.
+            </t>
+            <t>
+              アサーション取得メカニズムおよび不正なアサーションによってもたらされる攻撃.
+            </t>
+            <t>
+              特定のOAuthサーバーと紐づけられていないクライアント.
+              例えばPortable Contacts API <xref target="Portable-Contacts"></xref> 経由でコンタクトリストにアクセスすることができるメールクライアントなど.
+              このようなクライアントは事前に特定のOAuthサーバーと紐づけておくことはできず, dynamicにOAuthプロトコルの各URLを検知 (discover) する必要がある.
+            </t>
+          </list>
+        </t>
+
+        <!--
         <t><list style="symbols">
             <t>Communication between the authorization server and resource
             server.</t>
@@ -179,6 +228,7 @@
             registered upfront with a particular deployment and should
             dynamically discover the URLs relevant for the OAuth protocol.</t>
           </list></t>
+        -->
       </section>
 
       <section title="Attack Assumptions">
