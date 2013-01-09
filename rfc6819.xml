@@ -140,7 +140,7 @@
 
       <section title="Scope">
         <t>
-          本ドキュメントで述べられるSecurity Considerationsは, <xref target="RFC6749"></xref> の範囲内で実装されたOAuthサーバーと紐づくクライアントのみを考慮する.
+          本ドキュメントで述べられるSecurity Considerationsは, <xref target="RFC6749"></xref> がサポートする, 特定のOAuthサーバーと紐づくクライアントのみを考慮する.
           こういった実装は以下のような特徴を持つ.
         </t>
         <!--
