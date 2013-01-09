@@ -591,6 +591,15 @@
         -->
 
         <section title="Scope">
+          <t>
+            scopeは, scopeは特定のトークンに紐づき, リソースサーバー, リソース, およびリソースへの操作に関するアクセス認可を示す.
+            scopeは, OAuthにおいてアクセストークンの持つ権限を明示的に示す手段となる.
+            scopeは, 認可サーバーとエンドユーザーが, 比較的セキュアでなく信頼度の低いと考えられるOAuthクライアントに対して, リソースへのアクセス権限を制限・制御するために用いられる.
+            クライアントは必要に応じてトークンの権限を狭めるためだけにscopeを用いることができる.
+            (例: セキュアでないチャネルを通じてトークンが送信される際, 潜在的リスクを軽減するためなど)
+            典型的には, scopeはトークンの有効期間 (lifetime) 制限と併用され, 補完関係にある.
+          </t>
+          <!--
           <t>A scope represents the access authorization associated with a
           particular token with respect to resource servers, resources, and
           methods on those resources. Scopes are the OAuth way to explicitly
@@ -602,19 +611,34 @@
           would otherwise be granted, e.g., to reduce the potential impact
           if this token is sent over non-secure channels. A scope is typically
           complemented by a restriction on a token's lifetime.</t>
+          -->
         </section>
 
         <section title="Limited Access Token Lifetime">
+          <t>
+            "expires_in" というプロトコルパラメーターによって, 認可サーバーはアクセストークンの有効期間 (lifetime) を制限し, そのlifetimeに関する情報をクライアントに通知することができる.
+            (lifetimeは, ユーザーの意思によって行われたり, 認可サーバーのポリシーによって決定される)
+            このメカニズムにより, 認可サーバーが比較的セキュアでないと見なすOAuthクライアントに対して有効期間の短いトークンを発行したり, セキュアでないチャネルを利用する際に同様に有効期間を短くしたりすることができる.
+          </t>
+          <!--
           <t>The protocol parameter "expires_in" allows an authorization server
           (based on its policies or on behalf of the end user) to limit the
           lifetime of an access token and to pass this information to the
           client. This mechanism can be used to issue short-lived tokens to
           OAuth clients that the authorization server deems less secure, or
           where sending tokens over non-secure channels.</t>
+          -->
         </section>
       </section>
 
       <section title="Access Token">
+        <t>
+          アクセストークンはクライアントがリソースにアクセスする際に用いられる.
+          アクセストークンには, 典型的には (数分〜数時間程度の) セッションのlifetimeをカバーする程度の短い有効期間が設定される.
+          アクセストークンはリフレッシュトークンを用いることでリフレッシュ可能である.
+          有効期間の短いアクセストークンとリフレッシュトークンを併用することで, 明示的な無効化処理無しにアクセストークンの無効化が行われる可能性を高めることができる.
+        </t>
+        <!--
         <t>An access token is used by a client to access a resource. Access
         tokens typically have short life spans (minutes or hours) that cover
         typical session lifetimes. An access token may be refreshed through
@@ -622,6 +646,7 @@
         combination with the usage of refresh tokens, enables the possibility
         of passive revocation of access authorization on the expiry of the
         current access token.</t>
+        -->
       </section>
 
       <section title="Refresh Token">
