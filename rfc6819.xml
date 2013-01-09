@@ -650,12 +650,27 @@
       </section>
 
       <section title="Refresh Token">
+        <t>
+          リフレッシュトークンは, 特定のクライアントに対する長期間有効な認可情報を示す.
+          このトークンはクライアント・認可サーバー間でのみ送信される.
+          クライアントはこのトークンを使って新しい ("refresh" された) アクセストークンを取得することができる.
+        </t>
+        <!--
         <t>A refresh token represents a long-lasting authorization of a
         certain client to access resources on behalf of a resource owner. Such
         tokens are exchanged between the client and authorization server only.
         Clients use this kind of token to obtain ("refresh") new access tokens
         used for resource server invocations.</t>
+        -->
 
+        <t>
+          リフレッシュトークンによって, アクセストークンの有効期間を短く保ちつつ, ユーザーの関与無しに長期間有効なアクセス権限を維持することができる.
+          リフレッシュトークンは, (分散環境など) リソースサーバーと認可サーバーが同一エンティティでない場合に1つのアドバンテージをもたらす.
+          認可サーバーがリフレッシュトークンを無効化するだけで, 発行済アクセストークンが期限切れになった時点ですべてのアクセス権限を無効化することができるのである.
+          この際, アクセストークンの有効期間を短く保つことは, タイムリーなアクセス権限無効化の為に重要なポイントとなる.
+          (訳注: アクセストークンが複数のリソースサーバーに分散してしまっている状況で, それを確実に無効化するのは面倒な処理である)
+        </t>
+        <!--
         <t>A refresh token, coupled with a short access token lifetime, can be
         used to grant longer access to resources without involving end-user
         authorization. This offers an advantage where resource servers and
@@ -665,12 +680,35 @@
         token at any time, causing the granted access to be revoked once the
         current access token expires. Because of this, a short access token
         lifetime is important if timely revocation is a high priority.</t>
+        -->
 
+        <t>
+          リフレッシュトークンは, クライアント識別子および認可リクエストを行った特定のクライアントインスタンスに紐づいたsecretでもあり, リソースオーナー認可そのものを示すものでもある.
+          このことは以下の認可プロセスによって保証される.
+        </t>
+        <!--
         <t>The refresh token is also a secret bound to the client identifier
         and client instance that originally requested the authorization; the
         refresh token also represents the original resource owner grant.
         This is ensured by the authorization process as follows:</t>
+        -->
 
+        <t>
+          <list style="numbers">
+            <t>
+              リソースオーナーとユーザーエージェントがセキュアに認可コードをクライアントインスタンスに送付する.
+            </t>
+            <t>
+              クライアントは即座にセキュアチャネルを通じてそれを認可サーバーに送り, 受け取ったリフレッシュトークンをセキュアに保存する.
+            </t>
+            <t>
+              クライアントは常にリフレッシュトークンをセキュアチャネルを通じて送信し, アクセストークンを取得する.
+              (この際オプションで新たなリフレッシュトークンを得る)
+            </t>
+          </list>
+          以上により, クライアントが特定のトークンの秘匿性を維持する限り, リフレッシュトークンはクライアント自身を認証するためにも用いることができる.
+        </t>
+        <!--
         <t><list style="numbers">
             <t>The resource owner and user agent safely deliver the
             authorization "code" to the client instance in the first place.</t>
@@ -685,6 +723,7 @@
           </list>So, as long as the confidentiality of the particular token can
         be ensured by the client, a refresh token can also be used as an
         alternative means to authenticate the client instance itself.</t>
+        -->
       </section>
 
       <section title="Authorization &quot;code&quot;">
