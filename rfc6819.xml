@@ -277,12 +277,25 @@
       </section>
 
       <section title="Architectural Assumptions">
+        <t>
+          本セクションではセキュリティ上重要なデータに関して, OAuthの各エンティティが持ちうる機能, 制限および設計上のオプションについて仮定する.
+          これらは脅威解析における基礎となる.
+        </t>
+        <!--
         <t>This section documents assumptions about the features,
         limitations, and design options of the different entities of an OAuth
         deployment along with the security-sensitive data elements managed by
         those entities. These assumptions are the foundation of the threat
         analysis.</t>
+        -->
 
+        <t>
+          OAuthプロトコルはある程度実装に自由度を残している.
+          Core仕様は認可サーバーとリソースサーバーの基本的なコンセプトを定めている.
+          これら両サーバーは単一のエンティティとして実装されることもあれば, 分散した複数のエンティティとして実装される場合もある.
+          後者の典型例としては, 複数のサービスを提供している事業者が, 単一の認証・認可サービスを, 特にミドルウェアレベルで共通に用いるケースなどがある.
+        </t>
+        <!--
         <t>The OAuth protocol leaves deployments with a certain degree of
         freedom regarding how to implement and apply the standard. The core
         specification defines the core concepts of an authorization server and
@@ -291,11 +304,44 @@
         the case for multi-service providers with a single authentication and
         authorization system and is more typical in middleware
         architectures.</t>
+        -->
 
         <section title="Authorization Servers">
+          <t>
+            認可サーバーでは, 以下のデータが保存されているかアクセス可能な状態にある.
+          </t>
+          <!--
           <t>The following data elements are stored or accessible on the
           authorization server:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                ユーザーネームとパスワード
+              </t>
+              <t>
+                クライアントIDとクライアントシークレット
+              </t>
+              <t>
+                特定のクライアントと紐づけられたリフレッシュトークン
+              </t>
+              <t>
+                特定のクライアントと紐づけられたアクセストークン
+                (Handleベースデザイン <xref target="section_tokens"></xref> を用いる場合)
+              </t>
+              <t>
+                HTTPS 証明書/鍵
+              </t>
+              <t>
+                認可プロセスごとの "redirect_uri", "client_id" および認可 "code"
+                (Handleベースデザイン <xref target="section_tokens"></xref> を用いる場合)
+              </t>
+            </list>
+            (訳注: Assertionタイプのトークンを用いる場合, redirect_uri や client_id などがトークン自体に含まれており, それらが認可サーバー上には保存されていない場合もある)
+          </t>
+
+          <!--
           <t><list style="symbols">
               <t>usernames and passwords</t>
 
@@ -312,12 +358,37 @@
               handle-based design; <xref target="section_tokens"></xref>):
               "redirect_uri", "client_id", authorization "code"</t>
             </list></t>
+          -->
         </section>
 
         <section title="Resource Server">
+          <t>
+            リソースサーバーでは, 以下のデータが保存されているかアクセス可能な状態にある.
+          </t>
+          <!--
           <t>The following data elements are stored or accessible on the
           resource server:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                ユーザーデータ (詳細はプロトコルの範囲外)
+              </t>
+              <t>
+                HTTPS 証明書/鍵
+              </t>
+              <t>
+                認可サーバークレデンシャルもしくは認可サーバー共有鍵/公開鍵
+                (前者はHandleベースデザイン <xref target="section_tokens"></xref> を用いる場合, 後者はAssertionベースデザイン <xref target="section_tokens"></xref> を用いる場合)
+              </t>
+              <t>
+                (リクエストごとの) アクセストークン
+              </t>
+            </list>
+            リソースサーバーはリフレッシュトークン, ユーザーパスワードおよびクライアントシークレットは知らないものとする.
+          </t>
+          <!--
           <t><list style="symbols">
               <t>user data (out of scope)</t>
 
@@ -333,9 +404,16 @@
 
           It is assumed that a resource server has no knowledge of
           refresh tokens, user passwords, or client secrets.</t>
+          -->
         </section>
 
         <section title="Client">
+          <t>
+            OAuthでは, クライアントとはリソースオーナーの代理として, リソースオーナーの認可のもとで保護リソースへのアクセスを行うアプリケーションである.
+            Webアプリケーション, ユーザーエージェントベースアプリケーション, ネイティブアプリケーションといったクライアントタイプごとに, 実装上およびセキュリティ上の特徴は異なる.
+            クライアントタイプとそのプロフィールについては <xref target="RFC6749"></xref> Section 2.1 に定義されている.
+          </t>
+          <!--
           <t>In OAuth, a client is an application making protected resource
           requests on behalf of the resource owner and with its authorization.
           There are different types of clients with different implementation
@@ -343,10 +421,33 @@
           native applications. A full definition of the different client types
           and profiles is given in <xref target="RFC6749"></xref>,
           Section 2.1.</t>
+          -->
 
+          <t>
+            クライアントでは, 以下のデータが保存されているかアクセス可能な状態にある.
+          </t>
+          <!--
           <t>The following data elements are stored or accessible on the
           client:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クライアントID (およびクライアントシークレットもしくはそれに相当する何らかのクライアントクレデンシャル)
+              </t>
+              <t>
+                エンドユーザーごと, もしくはその他のセキュリティコンテキストや委譲コンテキストごとの, 1つ以上のリフレッシュトークン (長期間) およびアクセストークン (短期間)
+              </t>
+              <t>
+                信頼された証明機関の証明書 (Trusted CA certificates, HTTPS)
+              </t>
+              <t>
+                認可プロセスごとの "redirect_uri", 認可 "code"
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>client id (and client secret or corresponding client
               credential)</t>
@@ -360,6 +461,7 @@
               <t>per-authorization process: "redirect_uri",
               authorization "code"</t>
             </list></t>
+          -->
         </section>
       </section>
     </section>
