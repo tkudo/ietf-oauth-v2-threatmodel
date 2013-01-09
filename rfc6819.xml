@@ -813,15 +813,42 @@
       </section>
 
       <section title="Client Identifier">
+        <t>
+          認証プロトコルは一般的にエンドユーザーの代理として動作するソフトウェアコンポーネントの素性に関しては考慮しない.
+          しかしながらOAuthはそれを考慮し, 認可委譲におけるセキュリティレベルを向上している.
+          OAuthクライアントがユーザーが不在な状況でも動作しうるとうことも, その理由である.
+        </t>
+        <!--
         <t>Authentication protocols have typically not taken into account the
         identity of the software component acting on behalf of the end user.
         OAuth does this in order to increase the security level in delegated
         authorization scenarios and because the client will be able to act
         without the user being present.</t>
+        -->
 
+        <t>
+          OAuthでは以下のように, 一連のリクエストが同一クライアントによって実行されているかを照合するため, クライアント識別子を用いる.
+        </t>
+        <!--
         <t>OAuth uses the client identifier to collate associated requests to
         the same originator, such as</t>
+        -->
 
+        <t>
+          <list style="symbols">
+            <t>
+              特定エンドユーザーの認可プロセスと, それに続くトークンエンドポイントにおける認可コードとトークンの交換リクエスト
+            </t>
+            <t>
+              エンドユーザーによる特定クライアントへの認可およびその際に発行された初期のトークンと, 該当クライアントがその後ユーザーの同意無しに取得したトークン
+              (初回以降の認可自動承認プロセスを意味する)
+            </t>
+          </list>
+          クライアント識別子は, 認可サーバーがユーザーに同意を求める際に, そのクライアントに関する情報を表示するためにも用いられる.
+          さらに特定のクライアントからのリクエスト数を制限したり, リクエストに対して課金を行う際に用いられることもある.
+          サーバーログファイルなどで異なるクライアントからのアクセスを区別する際に用いることもできるであろう.
+        </t>
+        <!--
         <t><list style="symbols">
             <t>a particular end-user authorization process and the
             corresponding request on the token's endpoint to exchange the
@@ -838,7 +865,15 @@
         client or to charge the client per request. It may furthermore be
         useful to differentiate access by different clients, e.g., in server
         log files.</t>
+        -->
 
+        <t>
+          OAuthは, クライアントが認可サーバーに対して自身を認証する能力に基づいて, コンフィデンシャルとパブリックという2つのクライアントタイプを定義している.
+          (例: クライアントクレデンシャルの秘匿性を保持できるかどうかなど)
+          コンフィデンシャルクライアントはクライアントクレデンシャル (クライアント識別子と紐づいたクライアントシークレットなど) を秘匿に保つことができる, もしくはクライアントアサーション (SAML参照) や鍵暗号法などの手段によりセキュアにクライアント認証を行うことができる.
+          なお後者のクライアントアサーション (SAML参照) や鍵暗号法を用いた手段の方が, よりセキュアであると考えられる.
+        </t>
+        <!--
         <t>OAuth defines two client types, confidential and public, based on
         their ability to authenticate with the authorization server (i.e.,
         ability to maintain the confidentiality of their client credentials).
@@ -847,7 +882,15 @@
         identifier) or capable of secure client authentication using other
         means, such as a client assertion (e.g., SAML) or key cryptography. The
         latter is considered more secure.</t>
+        -->
 
+        <t>
+          認可サーバーはクライアントがシークレットを秘匿に保てるかどうか, セキュアな認証方式を利用可能かどうかなどを特定すべきである.
+          ただしその代わりにエンドユーザーがクライアントの素性を検証することも可能である.
+          (信頼できるアプリケーションのみをインストールするなど)
+          リダイレクトURIは, クレデンシャルを偽のクライアントに送信することを防止するために用いられる場合もあるが, クライアントの素性を検証するために用いることはできない. 
+        </t>
+        <!--
         <t>The authorization server should determine whether the client is
         capable of keeping its secret confidential or using secure
         authentication. Alternatively, the end user can verify the identity of
@@ -855,10 +898,53 @@
         redirect URI can be used to prevent the delivery of credentials to a
         counterfeit client after obtaining end-user authorization in some
         cases but can't be used to verify the client identifier.</t>
+        -->
 
+        <t>
+          クライアントはクライアントタイプ, プロフィールおよびデプロイモデルによって以下のように分類できる.
+          (native, webアプリケーションなど, <xref target="RFC6749"></xref> Section 9参照)
+        </t>
+        <!--
         <t>Clients can be categorized as follows based on the client type,
         profile (e.g., native vs. web application; see <xref
         target="RFC6749"></xref>, Section&nbsp;9), and deployment model:</t>
+        -->
+
+        <t>
+          <list style="hanging">
+            <t hangText="Deployment-independent &quot;client_id&quot; with pre-registered &quot;redirect_uri&quot; and without &quot;client_secret&quot;">
+              このケースでは, クライアント識別子は同一ソフトウェアの複数インスタンスに共通して利用される.
+              このようなクライアント識別子はエンドユーザーの関与無しには検証できない.
+              ネイティブアプリケーションにおいては, ユーザーにクライアントのメタ情報を提示し, ログファイル中でクライアントを区別するには十分である.
+              このクライアント識別子に紐づくアクセス権限の無効化は, 同一ソフトウェアの全インスタンスに影響する.
+            </t>
+
+            <t hangText="Deployment-independent &quot;client_id&quot; with pre-registered &quot;redirect_uri&quot; and with &quot;client_secret&quot;">
+              これはネイティブアプリケーションのためだけのオプションである.
+              この分類は, クライアントシークレットが適切に保護されないため推奨されない. (<xref target="ObtainClientSecrets"></xref> 参照)
+              セキュリティ上の弱点のため, このようなクライアント識別子は上記のシークレットを持たないクライアントと同レベルの信頼度となる.
+              アクセス権減の無効化は, 同一ソフトウェアの全インスタンスに影響する.
+            </t>
+
+            <t hangText="Deployment-specific &quot;client_id&quot; with pre-registered &quot;redirect_uri&quot; and with &quot;client_secret&quot;">
+              クライアント登録プロセスにおいて, リダイレクトURI, WebサイトURL, Webサイト名および連絡先などのクライアント属性の検証が行われることが保証される.
+              このようなクライアントは上記のすべてのユースケースで利用可能である.
+              このレベルは手動もしくはユーザーごとに固有の登録プロセスを伴うWebアプリケーションで実現される.
+              ネイティブアプリケーションでこのレベルを実現するのは非常に困難である.
+              ただし, アプリケーションのインストールが管理者によって行われ, 管理者によってクライアントの真正性が検証されているか, (アプリケーションマーケットプロバイダなどにより) end-to-endで単一エンティティによってデバイスインストールごとにクライアントクレデンシャルの生成が行われている場合には, ネイティブアプリケーションでもこのレベルを実現することは可能である.
+              アクセス権限の無効化は, 単一のインスタンスにのみ影響する.
+            </t>
+
+            <t hangText="Deployment-specific &quot;client_id&quot; with &quot;client_secret&quot; without validated properties">
+              このようなクライアントは認可サーバーによって特定トランザクション内のリクエスト (認可リクエスト, トークン発行リクエスト, リフレッシュトークン発行リクエストおよびアクセストークンリフレッシュリクエストなど) でのみ識別される.
+              認可サーバーはいかなるクライアント属性をもエンドユーザーに保証することはできない.
+              再認可時の自動認可処理は可能である.
+              このようなクライアントクレデンシャルはクライアント属性の検証無しに自動的に生成可能である.
+              これは特にネイティブアプリケーションには新たな選択肢となりうるであろう.
+              アクセス権限の無効化は, 単一のインスタンスにのみ影響する.
+            </t>
+          </list>
+        </t>
 
         <t><list style="hanging">
             <t
