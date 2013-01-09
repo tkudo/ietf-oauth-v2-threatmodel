@@ -467,14 +467,50 @@
     </section>
 
     <section anchor="sec_features" title="Security Features">
+      <t>
+        OAuth 2.0には, ある程度プロトコルレベルで攻撃やセキュリティリスクに対する対策が施されている.
+      </t>
+      <!--
       <t>These are some of the security features that have been built into
       the OAuth 2.0 protocol to mitigate attacks and security issues.</t>
+      -->
 
       <section anchor="section_tokens" title="Tokens">
+        <t>
+          OAuthは広範囲に渡っていろいろな種類のトークン (アクセストークン, リフレッシュトークン, 認可コード) を用いる.
+          トークンの表現方法としては以下の2通りがある.
+        </t>
+        <!--
         <t>OAuth makes extensive use of many kinds of tokens (access tokens,
         refresh tokens, authorization "codes"). The information content of a
         token can be represented in two ways, as follows:</t>
+        -->
 
+        <t>
+          <list style="hanging">
+            <t hangText="Handle (or artifact)">
+              "handle" ("artifact" とも呼ばれる) とは, 認可サーバー内部のデータ構造に対するある種の参照である.
+              内部データ構造には, ユーザーID (UID) やスコープなどのトークンの属性が含まれる.
+              handleを用いることで, トークン無効化処理を簡略化し, 暗号化メカニズムを不要にすることができる.
+              一方でhandleを用いると, 検証およびトークン内容取得のために, 発行者と消費者 (認可サーバーとリソースサーバーなど) の間の通信が必須となる.
+              これはトークンの発行者と利用者 (認可サーバーとリソースサーバーなど) が異なるエンティティである場合, パフォーマンスやスケーラビリティの点で不利である.
+              したがってhandleは主に発行者と消費者 (認可サーバーとリソースサーバーなど) が同一エンティティである場合に用いられることになるであろう.
+              handleトークンはしばしば "opaque" トークンと呼ばれるが, これはリソースサーバーがそのトークン自体を解読する必要がなく, 単なるトークン文字列として利用するのみだからである.
+            </t>
+
+            <t hangText="Assertion (aka self-contained token)">
+              assertionとはパース可能なトークンである.
+              assertionは典型的には有効期間, 発行対象 (audience) を持ち, 改竄防止および発行者認証のため電子署名が付けられる.
+              SAML assertion <xref target="OASIS.saml-core-2.0-os"></xref> や Kerberos ticket <xref target="RFC4120"></xref> が例として挙げられる.
+              assertionは典型的にはリソースサーバーに直接検証される.
+              このときリソースサーバーと認可サーバーの間で通信を行う必要はない.
+              これはトークンの発行者と利用者 (認可サーバーとリソースサーバーなど) が異なるエンティティである場合, パフォーマンスやスケーラビリティの点で有利である.
+              ただしassertionを用いた場合, トークン無効化の実装はhandleを用いた場合より困難である.
+            </t>
+          </list>
+          リソースサーバーへのリクエストにトークンを利用する場合, 以下の2つの方法を取りうる.
+        </t>
+        <!--
         <t><list style="hanging">
             <t hangText="Handle (or artifact)">A 'handle' is a reference
             to some internal
@@ -512,7 +548,25 @@
             assertions than with handles.</t>
           </list>Tokens can be used in two ways to invoke requests on resource
         servers, as follows:</t>
+        -->
 
+        <t>
+          <list style="hanging">
+            <t hangText="bearer token">
+              bearer tokenとは, それを受け取ったいかなるクライアントにも利用可能なトークンである (<xref target="RFC6750"></xref>).
+              トークンを所有していることのみがその利用条件であるため, エンドポイント間での通信がセキュアに保たれ, 許可されたエンドポイントのみがそのトークンにアクセスできる状態を担保することが重要である.
+              bearer tokenは, クライアントアプリケーションにとっては (proof tokenのように) 利用に際して特別な処理を行う必要がないため便利である.
+              bearer tokenはWeb上で single-sign-on (SSO) を行う際ブラウザで用いられるcookieと類似の特徴を持つ.
+            </t>
+
+            <t hangText="proof token">
+              proof tokenは特定のクライアントにのみ利用可能なトークンである.
+              クライアントは, トークン利用に際して毎回自身がトークン利用可能な主体であることを証明するために何らかの処理を行う必要がある.
+              クライアントにリクエスト内容に対して特定のトークンと紐づいた秘密鍵を用いて電子署名を要求する, MACタイプのアクセストークン (<xref target="OAuth-HTTP-MAC"></xref>) などがその例である.
+            </t>
+          </list>
+        </t>
+        <!--
         <t><list style="hanging">
             <t hangText="bearer token">A 'bearer token' is a token that can be
             used by any client who has received the token (e.g., <xref
@@ -534,6 +588,7 @@
             secret corresponding to the particular token sent with the
             request (e.g., <xref target="OAuth-HTTP-MAC"></xref>).</t>
           </list></t>
+        -->
 
         <section title="Scope">
           <t>A scope represents the access authorization associated with a
