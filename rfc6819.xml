@@ -1732,13 +1732,39 @@
         </section>
 
         <section title="Threat: User Unintentionally Grants Too Much Access Scope">
+          <t>
+            エンドユーザーの認可を受ける際, エンドユーザーは要求されたscopeおよび認可相手を理解していない場合もありうる.
+            本来許可されるべきでないリソースへのアクセスを, 許可してしまうこともあるであろう.
+          </t>
+          <!--
           <t>When obtaining end-user authorization, the end user may not
           understand the scope of the access being granted and to whom, or they
           may end up providing a client with access to resources that should
           not be permitted.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                ユーザーに対して要求されたscope (リソースおよびパーミッシュン) についての分かりやすい説明を行う.
+                (<xref target="informed_decisions"></xref>)
+              </t>
+              <t>
+                クライアントごとに要求できるscopeを制限する.
+                認可サーバーはクライアント識別子ごとにscopeを制御することを検討してもよい.
+                なお, このような意思決定はクライアントと認可サーバーの間で行われるものであり, OAuthの定めるところではない.
+                認可サーバーは, パブリッククライアントのscopeを狭めるなど, クライアントタイプごとに要求できるscopeを制限しても良い.
+                (<xref target="limit_scope"></xref>)
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Explain the scope (resources and the
               permissions) the user is about to grant in an understandable way
@@ -1754,10 +1780,16 @@
               lower scope to public clients
               (<xref target="limit_scope"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section anchor="mal_client3"
                  title="Threat: Malicious Client Obtains Existing Authorization by Fraud">
+          <t>
+            認可サーバーは既に同意済みのクライアントからの認可リクエストを自動承認することも考えられる.
+            ユーザーが認可サーバーの認可エンドポイントにリダイレクトされた際, 認可サーバーはそのユーザーが既にそのクライアントに対してアクセスを許可していることを検知し, その場合はユーザーに同意画面を表示することなく自動的にクライアントに戻すことができる.
+          </t>
+          <!--
           <t>Authorization servers may wish to automatically process
           authorization requests from clients that have been previously
           authorized by the user. When the user is redirected to the
@@ -1766,12 +1798,36 @@
           granted access to that particular client. Instead of prompting the
           user for approval, the authorization server automatically redirects
           the user back to the client.</t>
+          -->
 
+          <t>
+            不正なクライアントはこの機能を悪用し, 正規クライアントの代わりにここで得られる認可コードなどを取得する可能性がある.
+          </t>
+          <!--
           <t>A malicious client may exploit that feature and try to obtain
           such an authorization "code" instead of the legitimate client.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                認可サーバーは, クライアントが事前登録したリダイレクトURIが検証可能でない限り, パブリッククライアントに対して自動認可処理を行うべきではない.
+                (<xref target="val_redirect"></xref>)
+              </t>
+              <t>
+                認可サーバーは自動承認時に取得できるscopeを狭めることで, リスクを軽減できる.
+                (<xref target="limit_scope"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Authorization servers should not automatically process repeat
               authorizations to public clients unless the client is validated
@@ -1783,20 +1839,50 @@
               obtained through automated approvals
               (<xref target="limit_scope"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section anchor="open_redirector" title="Threat: Open Redirector">
+          <t>
+            アタッカーは認可エンドポイントとリダイレクトURIパラメーターを使って, 認可サーバーをオープンリダイレクタとして利用することができる.
+            オープンリダイレクタとは, 何の検証もなしにパラメーターとして指定された場所に対してユーザーエージェントをリダイレクトさせるエンドポイントのことである.
+          </t>
+          <!--
           <t>An attacker could use the end-user authorization endpoint and the
           redirect URI parameter to abuse the authorization server as an
           open redirector. An open redirector is an endpoint using a parameter
           to automatically redirect a user agent to the location specified by
           the parameter value without any validation.</t>
+          -->
 
+          <t>
+            影響: アタッカーはユーザーの認可サーバーに対する信頼を逆手に取り, フィッシング攻撃を仕掛けることができる.
+          </t>
+          <!--
           <t>Impact: An attacker could utilize a user's trust in an
           authorization server to launch a phishing attack.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クライアントにリダイレクトURI全体を事前登録させる.
+                (<xref target="val_redirect"></xref>)
+              </t>
+              <t>
+                クライアント識別子やリダイレクトURIが検証されない限り, リダイレクトURIへのリダイレクトを行わない.
+                (<xref target="val_redirect"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Require clients to register any full redirect URIs
               (<xref target="val_redirect"></xref>).</t>
@@ -1805,6 +1891,7 @@
               or redirect URI can't be verified
               (<xref target="val_redirect"></xref>).</t>
             </list></t>
+          -->
         </section>
       </section>
 
