@@ -1003,22 +1003,53 @@
     </section>
 
     <section anchor="threat_model" title="Threat Model">
+      <t>
+        このセクションではOAuth 2.0の脅威モデルを網羅的にまとめる.
+        まず各脅威を, クライアント, 認可サーバーおよびリソースサーバーという, 攻撃対象となる各OAuthコンポーネントごとに分類する.
+        続いてトークン取得と保護リソースへのアクセスという, フロー単位での分類を行う.
+        それぞれに対する対抗策は <xref target="security_considerations"></xref> にまとめる.
+      </t>
+      <!--
       <t>This section gives a comprehensive threat model of OAuth 2.0. Threats
       are grouped first by attacks directed against an OAuth component, which
       are the client, authorization server, and resource server. Subsequently,
       they are grouped by flow, e.g., obtain token or access protected
       resources. Every countermeasure description refers to a detailed
       description in <xref target="security_considerations"></xref>.</t>
+      -->
 
       <section title="Clients">
+        <t>
+          このセクションではOAuthクライアントに対する脅威について述べる.
+        </t>
+        <!--
         <t>This section describes possible threats directed to OAuth
         clients.</t>
+        -->
 
         <section anchor="ObtainClientSecrets"
                  title="Threat: Obtaining Client Secrets">
+          <t>
+            アタッカーは以下のようにして, 特定のクライアントのシークレットにアクセスする可能性がある.
+            (訳注: ここでの "access" は, secretが持つ権限に対するアクセスを意味し, あたかもそれを知っているかのようにして振る舞える, というニュアンス)
+          </t>
+          <!--
           <t>The attacker could try to get access to the secret of a
           particular client in order to:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                リフレッシュトークンおよび認可コードに対するリプレイ攻撃を行なう.
+              </t>
+              <t>
+                攻撃対象となるクライアントのclient_idを用いて該当クライアントになりすまし, トークンを取得する.
+              </t>
+            </list>
+            このような攻撃により, 以下のような影響が発生しうる.
+          </t>
+          <!--
           <t><list style="symbols">
               <t>replay its refresh tokens and authorization "codes", or</t>
 
@@ -1026,7 +1057,20 @@
               privileges of that "client_id" acting as an instance of the
               client.</t>
             </list>The resulting impact would be the following:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                認可サーバーアクセス時のクライアント認証をバイパスされる.
+              </t>
+              <t>
+                漏洩したリフレッシュトークンまたは認可コードを利用される.
+              </t>
+            </list>
+            クライアントの種類によっては, 以下のような攻撃も考えられる.
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Client authentication of access to the authorization server
               can be bypassed.</t>
@@ -1035,9 +1079,22 @@
               replayed.</t>
             </list>Depending on the client category, the following attacks
           could be utilized to obtain the client secret.</t>
+          -->
 
+          <t>
+            攻撃例: ソースコードまたはバイナリーからシークレットを取得
+          </t>
+          <!--
           <t>Attack: Obtain Secret From Source Code or Binary:</t>
+          -->
 
+          <t>
+            これはどのようなクライアントに対しても起こりうる攻撃である.
+            オープンソースプロジェクトでは, 公開レポジトリにあるソースコードから直接シークレットが漏洩する可能性がある.
+            アタッカーにソースコードが渡らない状況でも, バイナリーからシークレットを取得することもできる.
+            アプリケーション配布時にいかにシークレットの難読化を行っても, リバースエンジニアリングによってシークレットが漏洩する可能性は考慮すべきである.
+          </t>
+          <!--
           <t>This applies for all client types. For open source projects,
           secrets can be extracted directly from source code in their public
           repositories. Secrets can be extracted from application binaries
@@ -1047,9 +1104,36 @@
           consider that the secret can still be reverse-engineered by anyone
           with access to a complete functioning application bundle or
           binary.</t>
+          -->
 
+          <t>
+            対抗策
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                パブリッククライアントやセキュリティポリシーを満たさないクライアントに対してシークレットを発行しない.
+                (<xref target="dont_issue"></xref>)
+              </t>
+              <t>
+                パブリッククライアントに対しては明示的なユーザーの同意を必須とする.
+                (<xref target="forced_user_consent"></xref>)
+              </t>
+              <t>
+                クライアントインスタンス単位でシークレットを発行する.
+                (<xref target="depl_specific_secretes"></xref>)
+              </t>
+              <t>
+                クライアントシークレットの無効化を行う.
+                (<xref target="client_secret_revocation"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Don't issue secrets to public clients or clients with
               inappropriate security policy
@@ -1064,16 +1148,50 @@
               <t>Revoke client secrets
               (<xref target="client_secret_revocation"></xref>).</t>
             </list></t>
+          -->
 
+          <t>
+            <vspace blankLines="1" />
+            攻撃例: クライアントインスタンス単位で異なるシークレットを取得
+          </t>
+          <!--
           <t><vspace blankLines="1" />Attack: Obtain a Deployment-Specific
           Secret:</t>
+          -->
 
+          <t>
+            アタッカーはクライアントインスタンス単位で異なるシークレットを, Webサイト (Webサーバー) や特定デバイス (ネイティブアプリケーション) から取得する可能性がある.
+          </t>
+          <!--
           <t>An attacker may try to obtain the secret from a client
           installation, either from a web site (web server) or a particular
           device (native application).</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                Webサーバーの場合: (設定ファイルやデータベースなどに) 標準的な保護策を行う.
+                (<xref target="std_web"></xref>)
+              </t>
+              <t>
+                ネイティブアプリケーションの場合: シークレットをローカルのセキュアストレージに保存する.
+                (<xref target="secure_storage"></xref>)
+              </t>
+              <t>
+                クライアントシークレットを無効化する.
+                (<xref target="client_secret_revocation"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Web server: Apply standard web server protection measures
               (for config files and databases)
@@ -1085,6 +1203,7 @@
               <t>Revoke client secrets
               (<xref target="client_secret_revocation"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Refresh Tokens">
