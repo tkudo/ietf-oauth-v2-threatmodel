@@ -1903,14 +1903,42 @@
         <t></t>
 
         <section title="Threat: Eavesdropping Access Tokens">
+          <t>
+            アタッカーは認可サーバーとクライアントの通信を盗聴し, アクセストークンを取得する可能性がある.
+          </t>
+          <!--
           <t>Attackers may attempt to eavesdrop access tokens in transit from
           the authorization server to the client.</t>
+          -->
 
+          <t>
+            影響: アタッカーは該当アクセストークンの持つscopeの範囲内でアクセスできるすべてのリソースにアクセス可能になる.
+          </t>
+          <!--
           <t>Impact: The attacker is able to access all resources with the
           permissions covered by the scope of the particular access token.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                OAuth仕様に従って, 認可サーバーは通信がTLSで保護されていることを保証する必要がある.
+                (<xref target="conf_requests"></xref>)
+              </t>
+              <t>
+                end-to-endの秘匿性が保たれない場合, アクセストークンのscopeを狭めたり有効期限を短くしたりすることで, 漏洩時のリスクを軽減できる.
+                (<xref target="limit_scope"></xref>, <xref target="short_exp_time"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>As per the core OAuth spec, the authorization servers must
               ensure that these transmissions are protected using
@@ -1922,19 +1950,53 @@
               (<xref target="short_exp_time"></xref>) for access tokens can be
               used to reduce the damage in case of leaks.</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Access Tokens from Authorization Server Database">
+          <t>
+            認可サーバーがhandleベースのアクセストークンを用いてそれをデータベースに保存している場合, この攻撃が可能になる.
+            アタッカーはSQLインジェクションによって認可サーバーのデータベースアクセスを取得する可能性がある.
+          </t>
+          <!--
           <t>This threat is applicable if the authorization server stores
           access tokens as handles in a database. An attacker may obtain
           access tokens from the authorization server's database by gaining
           access to the database or launching a SQL injection attack.
           </t>
+          -->
 
+          <t>
+            影響: 全アクセストークンの漏洩
+          </t>
+          <!--
           <t>Impact: Disclosure of all access tokens.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                システムレベルのセキュリティ対策を行う.
+                (<xref target="std_sys"></xref>)
+              </t>
+              <t>
+                アクセストークンのhash値のみを保存する.
+                (<xref target="noclear"></xref>)
+              </t>
+              <t>
+                標準的SQLインジェクション対策を行う.
+                (<xref target="std_sql"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Enforce system security measures
               (<xref target="std_sys"></xref>).</t>
@@ -1945,18 +2007,46 @@
               <t>Enforce standard SQL injection countermeasures
               (<xref target="std_sql"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Disclosure of Client Credentials during Transmission">
+          <t>
+            アタッカーは, クライアント認証時やOAuthトークンリクエスト時に, クライアント・サーバー間を送信されるクライアントクレデンシャルを盗聴することができる.
+          </t>
+          <!--
           <t>An attacker could attempt to eavesdrop the transmission of client
           credentials between the client and server during the client
           authentication process or during OAuth token requests.</t>
+          -->
 
+          <t>
+            影響: クライアントクレデンシャルの漏洩は, クライアントサービスのフィッシングやなりすまし (impersonation) を容易にする.
+          </t>
+          <!--
           <t>Impact: Revelation of a client credential enabling phishing or
           impersonation of a client service.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クライアントクレデンシャル送信時はTLSを用いる.
+                (<xref target="conf_requests"></xref>)
+              </t>
+              <t>
+                クレデンシャルを平文で送信する必要の無い認証方式を採用する.
+                (HMACなど)
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>The transmission of client credentials must be protected
               using transport-layer mechanisms such as TLS
@@ -1966,19 +2056,52 @@
               sending of plaintext credentials over the wire (e.g., Hash-based
               Message Authentication Code).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Client Secret from Authorization Server Database">
+          <t>
+            アタッカーは, SQLインジェクション攻撃によって, 正規のclient_id/secretペアを認可サーバーのデータベースから盗み出すことができる.
+          </t>
+          <!--
           <t>An attacker may obtain valid "client_id"/secret combinations from
           the authorization server's database by gaining access to the
           database or launching a SQL injection attack. </t>
+          -->
 
+          <t>
+            影響: 全client_id/secretペアの漏洩. これはアタッカーにいかなる正規クライアントとしても動作することを許可する.
+          </t>
+          <!--
           <t>Impact: Disclosure of
           all "client_id"/secret combinations. This allows the attacker to act
           on behalf of legitimate clients.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                システムレベルのセキュリティ対策を行う.
+                (<xref target="std_sys"></xref>)
+              </t>
+              <t>
+                標準的SQLインジェクション対策を行う.
+                (<xref target="std_sql"></xref>)
+              </t>
+              <t>
+                "Enforce Credential Storage Protection Best Practices" に従って適切にクレデンシャルを扱う.
+                (<xref target="cred_storage_prot"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Enforce system security measures
               (<xref target="std_sys"></xref>).</t>
@@ -1990,14 +2113,48 @@
               "Enforce Credential Storage Protection Best Practices"
               (<xref target="cred_storage_prot"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Client Secret by Online Guessing">
+          <t>
+            アタッカーは正規のclient_id/secretペアを推測できる.
+          </t>
+          <!--
           <t>An attacker may try to guess valid "client_id"/secret pairs.</t>
+          -->
+
+          <t>
+            影響: 単一client_id/secretペアの漏洩.
+          </t>
+          <!--
           <t>Impact: Disclosure of a single "client_id"/secret pair.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                高エントロピーなシークレットを利用する.
+                (<xref target="high_entropy"></xref>)
+              </t>
+              <t>
+                アカウントをロックする.
+                (<xref target="lock_accounts"></xref>)
+              </t>
+              <t>
+                強固なクライアント認証を行う.
+                (<xref target="strong_client_authn"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Use high entropy for secrets
               (<xref target="high_entropy"></xref>).</t>
@@ -2007,6 +2164,7 @@
               <t>Use strong client authentication
               (<xref target="strong_client_authn"></xref>).</t>
             </list></t>
+          -->
         </section>
       </section>
 
