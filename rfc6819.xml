@@ -1675,6 +1675,14 @@
         <t></t>
 
         <section title="Threat: Password Phishing by Counterfeit Authorization Server">
+          <t>
+            OAuthは認可サーバーの真正性検証は行わない.
+            悪意ある者はこれを逆手に取って, クライアントのリクエストを遮り, 誤った, 場合によっては不正なレスポンスを返すことができる.
+            この攻撃はDNSやAddress Resolution Protocol (ARP) のなりすまし (spoofing) によって実現できる.
+            OAuthや類似プロトコルは, ユーザーに対してリダイレクトされた先でパスワードを入力するという行為に慣らすという側面も持つ.
+            そのためユーザーが注意を怠ると, Webサイトの真正性を確認せずにクレデンシャルを入力してしまうことになり, アタッカーにユーザーのパスワードを盗む機会を与えることとなる.
+          </t>
+          <!--
           <t>OAuth makes no attempt to verify the authenticity of the
           authorization server. A hostile party could take advantage of this
           by intercepting the client's requests and returning misleading or
@@ -1686,9 +1694,27 @@
           verify the authenticity of these web sites before entering
           their credentials, it will be possible for attackers to
           exploit this practice to steal users' passwords.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                認可サーバーはOAuth実装時にこのようなアタックを考慮し, 認可サーバーやレスポンスの真正性が問題となるすべてのリクエストにおいてTLSを必須とすべきである.
+                (<xref target="server_authn"></xref>)
+              </t>
+              <t>
+                認可サーバーはユーザーに対してフィッシング攻撃のリスクを教育し, ユーザーに認可サーバーの真正性を簡単に確認する手段を提供すべきである.
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Authorization servers should consider such attacks when
               developing services based on OAuth and should require the use
@@ -1702,6 +1728,7 @@
               that make it easy for users to confirm the authenticity of their
               sites.</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: User Unintentionally Grants Too Much Access Scope">
