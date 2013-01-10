@@ -946,6 +946,7 @@
           </list>
         </t>
 
+        <!--
         <t><list style="hanging">
             <t
             hangText="Deployment-independent &quot;client_id&quot; with pre-registered &quot;redirect_uri&quot; and without &quot;client_secret&quot;">Such
@@ -997,6 +998,7 @@
             native applications. Revocation will affect a single deployment
             only.</t>
           </list></t>
+        -->
       </section>
     </section>
 
