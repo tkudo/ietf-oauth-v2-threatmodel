@@ -1275,13 +1275,17 @@
           <t>
             アタッカーはWebアプリケーションの脆弱性を突いてリフレッシュトークンを取得する可能性がある.
           </t>
+          <!--
+          <t>An attacker may obtain the refresh tokens issued to a web
+          application by way of overcoming the web server's security controls.
+          </t>
+          -->
+
           <t>
             影響: Webアプリケーションでは複数ユーザーのアカウントが一括管理されているため, こういった攻撃によってそのサイト上のすべてのリフレッシュトークンが漏洩する可能性がある.
           </t>
           <!--
-          <t>An attacker may obtain the refresh tokens issued to a web
-          application by way of overcoming the web server's security controls.
-</t><t>
+          <t>
           Impact: Since a web application manages the user accounts of a
           certain site, such an attack would result in an exposure of all
           refresh tokens on that site to the attacker.</t>
@@ -1925,10 +1929,9 @@
           access tokens as handles in a database. An attacker may obtain
           access tokens from the authorization server's database by gaining
           access to the database or launching a SQL injection attack.
-</t>
-<t>
-Impact:
-          Disclosure of all access tokens.</t>
+          </t>
+
+          <t>Impact: Disclosure of all access tokens.</t>
 
           <t>Countermeasures:</t>
 
@@ -1969,7 +1972,8 @@ Impact:
           <t>An attacker may obtain valid "client_id"/secret combinations from
           the authorization server's database by gaining access to the
           database or launching a SQL injection attack. </t>
-<t>Impact: Disclosure of
+
+          <t>Impact: Disclosure of
           all "client_id"/secret combinations. This allows the attacker to act
           on behalf of legitimate clients.</t>
 
@@ -2091,7 +2095,8 @@ Impact:
             obtain authorization "codes" from the authorization server's
             database by gaining access to the database or launching a SQL
             injection attack. </t>
-<t>Impact: Disclosure of all authorization "codes",
+
+            <t>Impact: Disclosure of all authorization "codes",
             most likely along with the respective "redirect_uri" and "client_id"
             values.</t>
 
@@ -3177,8 +3182,7 @@ Impact:
               (see <xref target="signed_tokens"></xref>).</t>
 
               <t>Security can be further strengthened by using a short access
-              token duration (see Sections <xref target="exp_time"
-format="counter"></xref> and <xref target="short_exp_time" format="counter"></xref>).</t>
+              token duration (see Sections <xref target="exp_time" format="counter"></xref> and <xref target="short_exp_time" format="counter"></xref>).</t>
             </list></t>
         </section>
 
