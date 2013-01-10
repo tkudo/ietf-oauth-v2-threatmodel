@@ -797,7 +797,7 @@
           stateパラメーターは, リクエストとそれに対するコールバックを紐づけCSRF攻撃 (<xref target="section_csrf"></xref>) を防止するために用いられる.
           CSRF攻撃においては, アタッカーは自身のリソースへのアクセスを許可し, アタッカーに対して発行されたトークンを含むリダイレクトリクエストをユーザーに実行させる.
           stateパラメーターはユーザーエージェントと紐付けられ, ユーザーエージェントはそれをクライアントおよびユーザーエージェントのみにアクセス可能な場所に保存する.
-          (例: same-originポリシーによって保護された場所)  
+          (例: same-originポリシーによって保護された場所)
         </t>
         <!--
         <t>The "state" parameter is used to link requests and callbacks to
@@ -888,7 +888,7 @@
           認可サーバーはクライアントがシークレットを秘匿に保てるかどうか, セキュアな認証方式を利用可能かどうかなどを特定すべきである.
           ただしその代わりにエンドユーザーがクライアントの素性を検証することも可能である.
           (信頼できるアプリケーションのみをインストールするなど)
-          リダイレクトURIは, クレデンシャルを偽のクライアントに送信することを防止するために用いられる場合もあるが, クライアントの素性を検証するために用いることはできない. 
+          リダイレクトURIは, クレデンシャルを偽のクライアントに送信することを防止するために用いられる場合もあるが, クライアントの素性を検証するために用いることはできない.
         </t>
         <!--
         <t>The authorization server should determine whether the client is
@@ -1486,17 +1486,54 @@
         </section>
 
         <section title="Threat: Obtaining Access Tokens">
+          <t>
+            クライアントタイプによっては, アクセストークンがアタッカーに漏洩するいくつかのパターンがある.
+            アクセストークンが他のアプリケーションからアクセス可能ななんらかのストレージデバイスに保存されている場合には, アクセストークンが盗まれる可能性もある.
+          </t>
+          <!--
           <t>Depending on the client type, there are different ways that access
           tokens may be revealed to an attacker. Access tokens could be stolen
           from the device if the application stores them in a storage device
           that is accessible to other applications.</t>
+          -->
 
+          <t>
+            影響: トークンがbearer tokenであり, クライアント識別に付加的なメカニズムが用いられていない場合, アタッカーはそのトークンのscopeの範囲内でアクセスできるすべてのリソースにアクセス可能となる.
+          </t>
+          <!--
           <t>Impact: Where the token is a bearer token and no additional
           mechanism is used to identify the client, the attacker can access
           all resources associated with the token and its scope.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                アクセストークンを一時的なメモリー空間に保存し, アクセス制限を行う.
+                (<xref target="access_tokens"></xref>)
+              </t>
+              <t>
+                トークンのscopeを制限する.
+                (<xref target="limit_scope"></xref>)
+              </t>
+              <t>
+                アクセストークンをプライベートメモリー内にとどめるか, リフレッシュトークンと同様の保護策を取る.
+                (<xref target="refresh_tokens"></xref>)
+              </t>
+              <t>
+                アクセストークンの有効期間を短くする.
+                (<xref target="short_exp_time"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Keep access tokens in transient memory and limit grants
               (<xref target="access_tokens"></xref>).</t>
@@ -1510,9 +1547,17 @@
               <t>Keep access token lifetime short
               (<xref target="short_exp_time"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: End-User Credentials Phished Using Compromised or Embedded Browser">
+          <t>
+            不正なアプリケーションがエンドユーザーを騙し, 認可プロセスにおいてエンベッドブラウザを使ったフィッシング攻撃によりユーザーのパスワードを盗み取る可能性がある.
+            またエンベッドブラウザの代わりに独自のユーザーインタフェースを用いる可能性も考えられる.
+            このような方法では, TLSなどの視覚的な信頼メカニズムをバイパスすることができるのである.
+            エンベッドもしくは内蔵クライアントインタフェースを用いる場合, クライアントアプリケーションが本来アクセス不可能であるはずの情報 (UID/password) へアクセスできる可能性がある.
+          </t>
+          <!--
           <t>A malicious application could attempt to phish end-user passwords
           by misusing an embedded browser in the end-user authorization
           process, or by presenting its own user interface instead of allowing
@@ -1523,14 +1568,36 @@
           interface, the client application has access to additional
           information to which it should not have access (e.g., UID/password).
           </t>
+          -->
 
+          <t>
+            影響:
+            クライアントアプリケーションもしくは通信自体が汚染されていると, ユーザーはそれに気がつかないであろう.
+            またユーザーネームやパスワードなど, 認可処理の際にやりとりされるすべての情報を盗まれることとなる.
+          </t>
+          <!--
           <t>Impact: If the client application or the communication is
           compromised, the user would not be aware of this, and all
           information in the authorization exchange, such as username and
           password, could be captured.</t>
+          -->
 
+          <t>
+            対応策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                OAuthフローはクライアントアプリケーションにパスワードが知られることなしに利用できるよう設計されている.
+                クライアントはユーザーに直接クレデンシャルを尋ねるべきではない.
+                加えて, OAuthは不正アプリケーションによる攻撃に対して保護策を施すものではなく, エンドユーザーのみがインストールするネイティブアプリケーションの信頼性についての責任を持っていることから, エンドユーザーにフィッシング攻撃や各種ベストプラクティスについて教育を施すことも重要であろう.
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>The OAuth flow is designed so that client applications never
               need to know user passwords. Client applications should avoid
@@ -1552,10 +1619,16 @@
               should instead delegate this task to a trusted system component,
               e.g., the system browser.</t>
             </list></t>
+          -->
         </section>
 
         <section anchor="open_redirector_client"
                  title="Threat: Open Redirectors on Client">
+          <t>
+            オープンリダイレクタとは, 何の検証もなしにパラメーターとして指定された場所に対してユーザーエージェントをリダイレクトさせるエンドポイントのことである.
+            認可サーバーがクライアントに部分的なリダイレクトURIの登録 (訳注: Hostのみ, Pathの一部のみなど) を許す場合, アタッカーはクライアントが持つオープンリダイレクタを悪用し, 認可サーバーの検証をすり抜けて認可コードまたはアクセストークンを自身のコントロール下にあるエンドポイントに送信することが可能となる.
+          </t>
+          <!--
           <t>An open redirector is an endpoint using a parameter to
           automatically redirect a user agent to the location specified by the
           parameter value without any validation. If the authorization server
@@ -1564,16 +1637,37 @@
           construct a redirect URI that will pass the authorization server
           validation but will send the authorization "code" or access token to
           an endpoint under the control of the attacker.</t>
+          -->
 
+          <t>
+            影響: アタッカーは認可コードやアクセストークンにアクセスすることが可能になる.
+          </t>
+          <!--
           <t>Impact: An attacker could gain access to authorization "codes" or
           access tokens.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クライアントにリダイレクトURI全体を事前登録させる.
+                (<xref target="val_redirect"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Require clients to register full redirect URI
               (<xref target="val_redirect"></xref>).</t>
             </list></t>
+          -->
         </section>
       </section>
 
@@ -1716,7 +1810,7 @@
           <t>This threat is applicable if the authorization server stores
           access tokens as handles in a database. An attacker may obtain
           access tokens from the authorization server's database by gaining
-          access to the database or launching a SQL injection attack. 
+          access to the database or launching a SQL injection attack.
 </t>
 <t>
 Impact:
@@ -2163,7 +2257,7 @@ Impact:
                 <t>The client may consider using other flows that are not
                 vulnerable to this kind of attack, such as the implicit grant
                 type (see <xref target="implicit_flow"></xref>) or
-                resource owner password credentials (see <xref 
+                resource owner password credentials (see <xref
                 target="pwd_flow"></xref>).</t>
               </list></t>
           </section>
