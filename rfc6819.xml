@@ -48,12 +48,12 @@
 
     <workgroup>OAuth Working Group</workgroup>
 
-<keyword>authorization</keyword>
-<keyword>authentication</keyword>
-<keyword>token</keyword>
-<keyword>counter-measures</keyword>
-<keyword>HTTP</keyword>
-<keyword>REST</keyword>
+    <keyword>authorization</keyword>
+    <keyword>authentication</keyword>
+    <keyword>token</keyword>
+    <keyword>counter-measures</keyword>
+    <keyword>HTTP</keyword>
+    <keyword>REST</keyword>
 
     <abstract>
       <t>
