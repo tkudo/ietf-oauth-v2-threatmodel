@@ -3457,16 +3457,30 @@
     </section>
 
     <section anchor="security_considerations" title="Security Considerations">
+      <t>
+        本セクションでは <xref target="threat_model"/> で述べた脅威を軽減するために推奨する対抗策について述べる.
+      </t>
+      <!-- 
       <t>This section describes the countermeasures as recommended to mitigate
       the threats described in <xref target="threat_model"/>.</t>
-
+      -->
       <section title="General">
+        <t>
+         本セクションはすべてのOAuthコンポーネント (クライアント, リソースサーバー, トークンサーバーおよびユーザーエージェント) に対し一般に適用される考慮を対象とする.
+        </t>
+        <!-- 
         <t>This section covers considerations that apply generally
         across all OAuth components (client, resource server, token server,
         and user agents).</t>
-
+        -->
         <section anchor="conf_requests"
                  title="Ensure Confidentiality of Requests">
+          <t>
+            これはクライアントから認可サーバーまたはリソースサーバーへ送信されるすべてのリクエスト対し適用可能である.
+            OAuthはリクエストの完全性検証のための方式を提供するが, リクエストの秘匿性を保つための方式は提供しない.
+            さらなる予防措置を行わない限り, 盗聴者はリクエストの中身にフルアクセスし, シークレットやトークンなどのリクエストの中身を用いて遮断やリプレイアタックを開始することが可能となる.
+          </t>
+          <!-- 
           <t>This is applicable to all requests sent from the client to the
           authorization server or resource server. While OAuth provides a
           mechanism for verifying the integrity of requests, it provides no
@@ -3474,20 +3488,64 @@
           taken, eavesdroppers will have full access to request content and
           may be able to mount interception or replay attacks by using the
           contents of requests, e.g., secrets or tokens.</t>
+          -->
 
+          <t>
+            TLS <xref target="RFC5246"></xref> のようなトランスポート層でのセキュリティ機構を用いることによって攻撃を軽減することが可能である.
+            IPsec VPN <xref target="RFC4301"></xref> のような仮想プライベートネットワーク (VPN) も同様に考慮に値する.
+            (訳注: 「transport-layer mechanisms such as TLS」は, 文脈から「transport-layer "security" mechanisms such as TLS」と見なした. )
+          </t>
+          <!-- 
           <t>Attacks can be mitigated by using transport-layer mechanisms such
           as TLS <xref target="RFC5246"></xref>. A virtual private network
           (VPN), e.g., based on IPsec VPNs <xref target="RFC4301"></xref>, may
           be considered as well.</t>
-
+          -->
+          
+          <t>
+            注: 当文書では各々のプロトコルエンティティ間のコネクションがend-to-endのTLSで保護されていることを想定している.
+            データセンターの境界などのようにTLSをオフロードすることによってこの想定から外れているデプロイは, これによって引き起こされる新たな (主に内部者による) 脅威に対する説明のために, この脅威モデルを改良しなければならない.
+          </t>
+          <!-- 
           <t>Note: This document assumes end-to-end TLS protected connections
           between the respective protocol entities. Deployments deviating from
           this assumption by offloading TLS in between (e.g., on the data
           center edge) must refine this threat model in order to account for
           the additional (mainly insider) threat this may cause.</t>
+          -->
 
+          <t>
+            これは以下の脅威に対する対抗策である: 
+          </t>
+          <!-- 
           <t>This is a countermeasure against the following threats:</t>
+          -->
+          
+          <t><list style="symbols">
+              <t>
+                トークンエンドポイントやリソースサーバーのエンドポイントとの通信路上で得られたアクセストークンのリプレイ
+              </t>
 
+              <t>
+                トークンエンドポイントとの通信路上で得られたリフレッシュトークンのリプレイ
+              </t>
+
+              <t>
+                トークンエンドポイントとの通信路上で得られた認可コードのリプレイ
+                (もしくはリダイレクトエンドポイントとの通信路上)
+
+                (訳注: 原文末尾の「(redirect?)」はクライアントのリダイレクトエンドポイント (redirection endpoint) との通信路上を示していると解釈した.
+                また「authorization "codes"」とダブルクォートされている意図は不明
+                 (パラメータ名のダブルクォートを後から一括置換したりして変になっている？).
+                以降は明確にパラメータ名としてダブルクォートされていない限り無視する.
+                またアクセストークンと認可コードは, 認可エンドポイントとの通信路上も流れるが, 上記で触れらていないのは記述の漏れの可能性あり. )
+              </t>
+
+              <t>
+                ユーザーパスワードとクライアントシークレットのリプレイ
+              </t>
+            </list></t>
+          <!-- 
           <t><list style="symbols">
               <t>Replay of access tokens obtained on the token's endpoint or
               the resource server's endpoint</t>
@@ -3499,15 +3557,31 @@
 
               <t>Replay of user passwords and client secrets</t>
             </list></t>
+          -->
+
         </section>
 
         <section anchor="server_authn" title="Utilize Server Authentication">
+          <t>
+            HTTPSサーバー認証や類似の手段によってサーバーのアイデンティティを認証することが可能である.
+            その目的は, 接続の確立の際にサーバーの完全修飾ドメイン名とサーバーから提示された公開鍵とを確実に結びつけることである
+            (<xref target="RFC2818"></xref> 参照).
+          </t>
+          <!-- 
           <t>HTTPS server authentication or similar means can be used to
           authenticate the identity of a server. The goal is to reliably bind
           the fully qualified domain name of the server to the public key
           presented by the server during connection establishment (see <xref
           target="RFC2818"></xref>).</t>
+          -->
 
+          <t>
+            クライアントはサーバーとそのドメイン名の結びつきを検証すべきである.
+            その結びつきの証明に失敗した場合, その通信はman-in-the-middle攻撃を受けていると考えられる.
+            このセキュリティ手法は, この目的においてクライアントが信頼している認証局 (CA) に依存している.
+            クライアントはこれらの信頼するCAを慎重に選択すべきであり, 信頼するCAの証明書を格納するストレージを変更されないように保護すべきである.
+          </t>
+          <!-- 
           <t>The client should validate the binding of the server to its
           domain name. If the server fails to prove that binding, the
           communication is considered a man-in-the-middle attack.
@@ -3515,9 +3589,22 @@
           the client trusts for that purpose.
           Clients should carefully select those trusted CAs and protect the
           storage for trusted CA certificates from modifications.</t>
+          -->
 
+          <t>これは以下の脅威に対する対抗策である: </t>
+          <!-- 
           <t>This is a countermeasure against the following threats:</t>
+          -->
 
+          <t><list style="symbols">
+              <t>なりすまし (Spoofing)</t>
+
+              <t>通信への不正介在 (Proxying)</t>
+
+              <t>偽のサーバーによるフィッシング</t>
+            </list>
+          </t>
+          <!-- 
           <t><list style="symbols">
               <t>Spoofing</t>
 
@@ -3525,10 +3612,20 @@
 
               <t>Phishing by counterfeit servers</t>
             </list></t>
+          -->
+
         </section>
 
         <section anchor="informed"
                  title="Always Keep the Resource Owner Informed">
+          <t>
+            リソースオーナーへの透明性は, OAuthプロトコルの鍵となる要素である.
+            ユーザーは常に認可処理の指令者であるべきであり, 判断に必要な情報を得られるべきである.
+            さらにいえばユーザーの関与はよりよいセキュリティ対抗策である.
+            ユーザーは恐らくある種の攻撃に対して, 認可サーバーよりも正しく認識することができる.
+            認可プロセス時, 認可プロセス後, そしてユーザーが情報を得たいと思った時のいずれも, 下記のような手法を用いて情報の提示と交換を行うことができる:
+          </t>
+          <!-- 
           <t>Transparency to the resource owner is a key element of the OAuth
           protocol. The user should always be in control of the authorization
           processes and get the necessary information to make informed
@@ -3538,7 +3635,29 @@
           presented/exchanged during the authorization process, after the
           authorization process, and every time the user wishes to get
           informed by using techniques such as:</t>
+          -->
 
+          <t><list style="symbols">
+              <t>
+                ユーザ同意のフォーム.
+              </t>
+
+              <t>
+                通知メッセージ (例えば, Eメール, SMS, &hellip;).
+                通知はフィッシング攻撃ベクトルにもなりうることに注意.
+                通知メッセージは, フィッシングメッセージをそこから派生できないようなものであるべきである.
+              </t>
+
+              <t>
+                アクティビティ/イベント ログ.
+              </t>
+
+              <t>
+                ユーザー自身によりケアのできるアプリケーションあるいはポータル.
+              </t>
+               
+            </list></t>
+          <!-- 
           <t><list style="symbols">
               <t>User consent forms.</t>
 
@@ -3551,70 +3670,137 @@
 
               <t>User self-care applications or portals.</t>
             </list></t>
+          -->
+
         </section>
 
         <section title="Credentials">
+          <t>
+            当セクションでは未認可のアクセスや悪用からあらゆる種類のクレデンシャルを保護するための対抗策について述べる.
+            クレデンシャルは, あらゆる種類のトークン (リフレッシュトークンやアクセストークン) や認可コード, あるいはクライアントシークレットやユーザーパスワードのような, 長寿命のシークレットである.
+          </t>
+          <!--
           <t>This section describes countermeasures used to protect all kinds
           of credentials from unauthorized access and abuse. Credentials are
           long-term secrets, such as client secrets and user passwords as well
           as all kinds of tokens (refresh and access tokens) or
           authorization "codes".</t>
+          -->
 
           <section anchor="cred_storage_prot"
                    title="Enforce Credential Storage Protection Best Practices">
+            <t>
+              管理者はクレデンシャルのストレージ保護に関する業界のベストプラクティスを採用すべきである
+              (例えば,  <xref target="OWASP"></xref> 参照).
+              このようなプラクティスは以下のサブセクションの事項に限定されるものではない.
+            </t>
+            <!--
             <t>Administrators should undertake industry best practices to
             protect the storage of credentials (for example, see <xref
             target="OWASP"></xref>). Such practices may include but are not
             limited to the following sub-sections.</t>
+            -->
 
             <section anchor="std_sys"
                      title="Enforce Standard System Security Means">
+              <t>
+                攻撃者がセンシティブな設定ファイルやデータベースにアクセスできないように, サーバーシステムはロックダウン (権限によりアクセス制限) されていることがある.
+              </t>
+              <!--
               <t>A server system may be locked down so that no attacker may
               get access to sensitive configuration files and databases.</t>
+              -->
             </section>
 
             <section anchor="std_sql"
                      title="Enforce Standard SQL Injection Countermeasures">
+              <t>
+                クライアント識別子やその他の認証コンポーネントをSQLデータベースに対し問い合わせたり比較する場合, 受け取ったパラメータを送信する前に検証しなければインジェクション攻撃を受ける可能性がある.
+              </t>
+              <!--
               <t>If a client identifier or other authentication component is
               queried or compared against a SQL database, it may become
               possible for an injection attack to occur if parameters received
               are not validated before submission to the database.</t>
+              -->
 
               <t><list style="symbols">
+                  <t>
+                    攻撃サーフェスを減らすため, サーバーコードで利用するデータベース特権が最小限になっていることを確認すること.
+                  </t>
+                  <!--
                   <t>Ensure that server code is using the minimum database
                   privileges possible to reduce the "surface" of possible
                   attacks.</t>
+                  -->
 
+                  <t>
+                    入力文字を結合した動的なSQLを避けること.
+                    可能であれば静的なSQLを使うこと.
+                  </t>
+                  <!--
                   <t>Avoid dynamic SQL using concatenated input. If possible,
                   use static SQL.</t>
+                  -->
 
+                  <t>
+                    動的SQLを使う際は, バインド引数によりクエリをパラメータ化すること.
+                  </t>
+                  <!--
                   <t>When using dynamic SQL, parameterize queries using bind
                   arguments. Bind arguments eliminate the possibility of SQL
                   injections.</t>
+                  -->
 
+                  <t>
+                    入力はフィルタリングとサニタイジングを行うこと.
+                    例えば, 識別子が既知の書式の時, 提供された値が識別子の構文にマッチしているかを確認すること.
+                  </t>
+                  <!--
                   <t>Filter and sanitize the input. For example, if an
                   identifier has a known format, ensure that the supplied
                   value matches the identifier syntax rules.</t>
+                  -->
                 </list></t>
             </section>
 
             <section anchor="noclear"
                      title="No Cleartext Storage of Credentials">
+              <t>
+                認可サーバーはクリアテキストでクレデンシャルを格納すべきではない.
+                典型的なアプローチは代わりにハッシュを格納するか, クレデンシャルを暗号化することである.
+                (ユーザーパスワードであるため)クレデンシャルが十分なエントロピーレベルを持っていない場合, オフライン辞書攻撃を困難にするためのソルトを追加することによってストレージが強固になる.
+              </t>
+              <!--
               <t>The authorization server should not store credentials in
               clear text. Typical approaches are to store hashes instead or to
               encrypt credentials. If the credential lacks a reasonable
               entropy level (because it is a user password), an additional salt
               will harden the storage to make offline dictionary attacks more
               difficult.</t>
+              -->
 
+              <t>
+                注: いくつかの認証プロトコルは, 認可サーバがクリアテキストのシークレットにアクセスできる必要がある.
+                サーバがハッシュにしかアクセスできない場合, これらのプロトコルを実装することができない.
+                このようなケースの場合, クレデンシャルを強固に暗号化するべきである.
+              </t>
+              <!--
               <t>Note: Some authentication protocols require the authorization
               server to have access to the secret in the clear. Those
               protocols cannot be implemented if the server only has access to
               hashes. Credentials should be strongly encrypted in those
               cases.</t>
+              -->
             </section>
 
             <section title="Encryption of Credentials">
+              <t>
+                クライアントアプリケーションがクライアントクレデンシャルを安全に永続化していない場合, 攻撃者による取得のターゲットとなりやすい.
+                キーストアやデータベースのような暗号化永続機構を用いてクライアントクレデンシャルを格納すること.
+                クライアントクレデンシャルを直接クライアントコードに記述するとスキャニングに対し脆弱になる. またクライアントクレデンシャルの変更の管理が困難にもなる.
+              </t>
+              <!--
               <t>For client applications, insecurely persisted client
               credentials are easy targets for attackers to obtain. Store
               client credentials using an encrypted persistence mechanism such
@@ -3622,26 +3808,44 @@
               credentials directly into client code makes client applications
               vulnerable to scanning as well as difficult to administer should
               client credentials change over time.</t>
+              -->
             </section>
 
             <section title="Use of Asymmetric Cryptography">
+              <t>
+                非対称暗号を用いれば, 認可サーバはクレデンシャルの管理の責務から開放される.
+              </t>
+              <!--
               <t>Usage of asymmetric cryptography will free the authorization
               server of the obligation to manage credentials.</t>
+              -->
             </section>
           </section>
 
           <section anchor="online_secrets" title="Online Attacks on Secrets">
             <section anchor="pwd_policy"
                      title="Utilize Secure Password Policy">
+              <t>
+                オンラインパスワード攻撃を困難にすることに繋がるユーザーパスワードのエントロピー増加のため, 認可サーバーは複雑なユーザーパスワードポリシーを強制することもある.
+                複雑にしすぎた場合, ユーザーはパスワードを再利用したり, 紙にメモしたり, 安全でない方法で格納したりする可能性があることに注意すること.
+              </t>
+              <!--
               <t>The authorization server may decide to enforce a complex user
               password policy in order to increase the user passwords' entropy
               to hinder online password attacks. Note that too much complexity
               can increase the likelihood that users re-use passwords or write
               them down, or otherwise store them insecurely.</t>
+              -->
             </section>
 
             <section anchor="high_entropy"
                      title="Use High Entropy for Secrets">
+              <t>
+                人間によって利用されるのではないシークレット (例: クライアントシークレットやトークンハンドル) を生成するとき, 推測攻撃のリスクを軽減するために, 認可サーバーは合理的なレベルのエントロピーを含むように生成すべきである.
+                認可サーバーは, 128ビット以上の暗号論的に強固な乱数または擬似乱数シーケンスからトークンの値を生成するべきである
+                 (ベストカレントプラクティスとして <xref target="RFC4086"></xref> を参照).
+               </t>
+              <!--
               <t>When creating secrets not intended for usage by human users
               (e.g., client secrets or token handles), the authorization server
               should include a reasonable level of entropy in order to
@@ -3650,34 +3854,67 @@
               strong random or pseudo-random number sequence (see <xref
               target="RFC4086"></xref> for best current practice) generated by
               the authorization server.</t>
+              -->
             </section>
 
             <section anchor="lock_accounts" title="Lock Accounts">
+              <t>
+                ある一定の回数試行に失敗した場合, そのアカウントをロックすることにより, パスワードに対するオンライン攻撃を軽減することができる.
+              </t>
+              <!--
               <t>Online attacks on passwords can be mitigated by locking the
               respective accounts after a certain number of failed
               attempts.</t>
+              -->
 
+              <t>
+                注: この手法は正規のサービスユーザーのロックダウンに悪用される可能がある.
+              </t>
+              <!--
               <t>Note: This measure can be abused to lock down legitimate
               service users.</t>
+              -->
             </section>
 
             <section anchor="tar_pit" title="Use Tar Pit">
+              <t>
+                ユーザー名/パスワードによる認証の試行失敗に対して, 認可サーバーはそのアカウントをロックしたり, ある一定の時間, レスポンスを遅延させることがある.
+                この時間は, 試行失敗の回数に応じて, 増加することもある.
+                この目的は, あるユーザー名に対する攻撃者の試行をスローダウンさせることにある.
+              </t>
+              <!--
               <t>The authorization server may react on failed attempts to
               authenticate by username/password by temporarily locking the
               respective account and delaying the response for a certain
               duration. This duration may increase with the number of failed
               attempts. The objective is to slow the attacker's attempts on a
               certain username down.</t>
+              -->
 
+              <t>
+                注: これは認可サーバーのより複雑でステートフルな設計が必要となるかもしれない.
+              </t>
+              <!--
               <t>Note: This may require a more complex and stateful design of
               the authorization server.</t>
+              -->
             </section>
 
             <section anchor="captchas" title="Use CAPTCHAs">
+              <t>
+                人間の対話が必要になることにより, このアイデアはプログラムが大規模な数のパスワードの自動チェックを行うことを防ぐ.
+              </t>
+              <!--
               <t>The idea is to prevent programs from automatically checking
               a huge number of passwords, by requiring human interaction.</t>
+              -->
 
+              <t>
+                注: これは, ユーザーエクスペリエンスにネガティブなインパクトを与える.
+              </t>
+              <!--
               <t>Note: This has a negative impact on user experience.</t>
+              -->
             </section>
           </section>
         </section>
