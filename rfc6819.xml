@@ -2472,11 +2472,24 @@
 
           <section anchor="mal_client"
                    title="Threat: Malicious Client Obtains Authorization">
+            <t>
+              不正クライアントが正規クライアントになりすましてアクセス認可を取得する可能性がある.
+              不正クライアントによってはスクレイピングなどによりユーザーの同意フローをシミュレートすることも考えられる.
+            </t>
+            <!--
             <t>A malicious client could pretend to be a valid client and
             obtain an access authorization in this way. The malicious client
             could even utilize screen-scraping techniques in order to simulate
             a user's consent in the authorization flow.</t>
+            -->
 
+            <t>
+              推測: ユーザーのデバイスを不正なソフトウェアから保護する責務は認可サーバーにはない.
+              これは該当デバイス上で動作するプラットフォームの責務であり, プラットフォームはおそらく協調動作する (アプリケーションマネージメントインフラなどの) エコシステムと共同で, その任にあたるであろう.
+              認可サーバーが単体として責任を持つのは, リソースサーバー上のエンドユーザーのリソースに対するアクセス制御, およびOAuthプロトコルを通じたそれらへの不正アクセスの防止である.
+              この前提に基づき, ここで扱う脅威に対する対抗策として, 以下が考えられる.
+            </t>
+            <!--
             <t>Assumption: It is not the task of the authorization server to
             protect the end-user's device from malicious software. This is the
             responsibility of the platform running on the particular device,
@@ -2487,9 +2500,58 @@
             and to prevent unauthorized access to them via the OAuth protocol.
             Based on this assumption, the following countermeasures are
             available to cope with the threat.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  認可サーバーは可能な限りクライアント認証を行うべきである. (<xref target="depl_specific_secretes"></xref>)
+                  注: クライアント認証はエンドユーザーの認可プロセスの後に実施される.
+                </t>
+
+                <t>
+                  認可サーバーは, 事前登録されたリダイレクトURIがあれば, それを用いてクライアントが指定したリダイレクトURIを検証するべきである.
+                  (<xref target="val_redirect"></xref>)
+                  注: 不正なリダイレクトURIは不正クライアントによるアクセスを予測させるが, 正しいリダイレクトURIが正規のクライアントによるアクセスを保証する分けではないことに注意すること.
+                  リダイレクトURIの信頼性は, クライアントタイプに依存する.
+                  Webアプリケーションの場合, そのリダイレクトURIはグローバルにユニークかつFQDNがHTTPSサーバー認証を通じて検証されるため高い信頼を置ける.
+                  一方ネイティブクライアントでは, リダイレクトURIは多くの場合デバイスローカルなリソース (カスタムスキーマなど) を指す.
+                  よって, あるデバイス上では不正クライアントが正規クライアントのリダイレクトURIを利用可能であるような状況も考えられる.
+                </t>
+
+                <t>
+                  エンドユーザーを認証した後, 認可サーバーは該当ユーザーに同意を求めるべきである.
+                  ここで認可サーバーはクライアントによるアクセスの目的, scope, および認可の有効期間をエンドユーザーに示すべきである.
+                  さらに, 認可サーバーはユーザーにクライアントの身元を示すいかなる情報をも提示すべきである.
+                  ここで示される情報を使った特定アプリケーションの検証, および認可リクエストの許可/拒否の決定については, ユーザーに委ねられる.
+                  (<xref target="validation_end_user"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーは, 信頼できる方法によって認証もしくは検証されたクライアント以外に対しては, 自動再承認処理を行うべきではない.
+                  (<xref target="automatic_processing"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーがエンドユーザーの自動認証を行う場合, スクレイピングを防ぐ手段がなくなる可能性がある.
+                  こういった手段としては, CAPTCHAsや各種マルチファクター認証技術などが挙げられる.
+                </t>
+
+                <t>
+                  認可サーバーは, 信頼できる方法によって認証できないクライアントに対しては, 発行するトークンのスコープを制限することもありうる.
+                  (<xref target="limit_scope"></xref>)
+                </t>
+              </list>
+            </t>
+
+            <!--
             <t><list style="symbols">
                 <t>The authorization server should authenticate the client, if
                 possible (see <xref target="depl_specific_secretes"></xref>).
@@ -2539,6 +2601,7 @@
                 it issues to clients it cannot reliably authenticate
                 (see <xref target="limit_scope"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Authorization &quot;code&quot; Phishing">
