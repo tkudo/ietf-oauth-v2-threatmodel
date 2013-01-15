@@ -2173,20 +2173,57 @@
       </section>
 
       <section title="Obtaining Authorization">
+        <t>
+          本セクションでは, アクセストークン取得時の各フローにおいて発生する脅威について述べる.
+          それぞれのフローは, 認可エンドポイントおよびトークンエンドポイントにおけるレスポンスタイプとグラントタイプによって分類される.
+        </t>
+        <!--
         <t>This section covers threats that are specific to certain flows
         utilized to obtain access tokens. Each flow is characterized by
         response types and/or grant types on the end-user authorization and
         token endpoint, respectively.</t>
+        -->
 
         <section anchor="code_flow" title="Authorization &quot;code&quot;">
           <section anchor="eavesdropping"
                    title="Threat: Eavesdropping or Leaking Authorization &quot;codes&quot;">
+            <t>
+              アタッカーにより, 認可サーバーとクライアントの間の通信を盗聴され, 認可コードが漏洩する可能性がある.
+              加えて認可コードはブラウザ経由で送信されるので, その他の方法で意図せず信頼できないサイトやアタッカーに漏洩する可能性がある.
+            </t>
+            <!--
             <t>An attacker could try to eavesdrop transmission of the
             authorization "code" between the authorization server and client.
             Furthermore, authorization "codes" are passed via the browser, which
             may unintentionally leak those codes to untrusted web sites and
             attackers in different ways:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  リファラヘッダー: ブラウザにより, Webページ内にembedされたコンテンツのロード時やページ遷移時に, "referer" ヘッダーが付与される.
+                  これはヘッダー送信の対象サイトが元のサイトと信頼関係にない場合でも送信されうる.
+                  リファラーヘッダーはトラフィック解析のためログに残されることが多い.
+                </t>
+
+                <t>
+                  リクエストログ: Webサーバー上のリクエストログには, 一般的にリクエスト中のクエリーパラメータが含まれる.
+                </t>
+
+                <t>
+                  オープンリダイレクタ: Webサイトはしばしばリダイレクタを通じてユーザーを別のサイトに遷移させる.
+                  オープンリダイレクタは検証コード (訳注: 認可コードのことを指すと思われる) の漏洩の原因となりうる.
+                </t>
+
+                <t>
+                  ブラウザ履歴: Webブラウザは一般的に訪問履歴を記録する.
+                  同じブラウザを利用する場合, 過去に他のユーザーが訪問したURLが他者に漏洩する可能性がある.
+                </t>
+              </list>
+              注: SAMLプロトコル仕様 <xref target="OASIS.sstc-saml-bindings-1.1"></xref> Section 4.1.1.9.1 および <xref target="OASIS.sstc-sec-analysis-response-01"></xref> にこれらと同様の攻撃に関する記述がある.
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Referrer headers: Browsers frequently pass a
                 &ldquo;referer&rdquo; header when a web page embeds content,
@@ -2213,9 +2250,51 @@
             target="OASIS.sstc-saml-bindings-1.1"></xref>, Section 4.1.1.9.1;
             <xref target="Sec-Analysis"></xref>; and <xref
             target="OASIS.sstc-sec-analysis-response-01"></xref>.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  OAuth Core仕様にあるように, 認可サーバーおよびクライアントは, 通信がTLSなどのトランスポートレイヤーメカニズムによって保護されていることを保証しなければならない.
+                  (<xref target="conf_requests"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーがクライアントに可能な限りクライアント認証を要求することで, 認可コードと対象クライアントとの紐付けを検証することができる.
+                  (<xref target="bind_code_client_id"></xref>)
+                </t>
+
+                <t>
+                  認可コードの有効期間を短くする. (<xref target="short_exp_time"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーは認可コードをOne-timeトークンとして扱う. (<xref target="one_time_usage"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーが認可コードが複数回使われたことを検知した場合, その認可コードを用いて発行されたすべてのトークンを無効化することも検討できる.
+                  (<xref target="automatic_code_revocation"></xref>)
+                </t>
+
+                <t>
+                  以上のような対抗策が実施できない場合は, アクセストークンのscopeを狭め, 有効期間を短くすることで, リスクを軽減できる.
+                  (<xref target="limit_scope"></xref>, <xref target="short_exp_time"></xref>)
+                </t>
+
+                <t>
+                  クライアントサイトはリダイレクトURIに対するブラウザキャッシュをクリアするため, ページをリロードすることを検討してもよい.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>As per the core OAuth spec, the authorization server as
                 well as the client must ensure that these transmissions are
@@ -2232,7 +2311,7 @@
                 (<xref target="short_exp_time"></xref>).</t>
 
                 <t>The authorization server should enforce a one-time usage
-                restriction (see <xref target="one_time_usage"></xref>).</t>
+                restriction (see  (<xref target="one_time_usage"></xref>)).</t>
 
                 <t>If an authorization server observes multiple attempts to
                 redeem an authorization "code", the authorization server may
@@ -2249,6 +2328,7 @@
                 redirect URI in order to automatically clean up the browser
                 cache.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Obtaining Authorization &quot;codes&quot; from Authorization Server Database">
