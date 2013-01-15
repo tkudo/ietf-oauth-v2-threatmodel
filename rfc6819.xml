@@ -3561,8 +3561,8 @@
         <section anchor="server_authn" title="Utilize Server Authentication">
           <t>
             HTTPSサーバー認証や類似の手段によってサーバーのアイデンティティを認証することが可能である.
-            その目的は, 接続の確立の際にサーバーの完全修飾ドメイン名とサーバーから提示された公開鍵とを確実に結びつけることである
-            (<xref target="RFC2818"></xref> 参照).
+            その目的は, 接続の確立の際にサーバーの完全修飾ドメイン名とサーバーから提示された公開鍵とを確実に結びつけることである.
+            (<xref target="RFC2818"></xref> 参照)
           </t>
           <!--
           <t>HTTPS server authentication or similar means can be used to
@@ -3588,7 +3588,7 @@
           storage for trusted CA certificates from modifications.</t>
           -->
 
-          <t>これは以下の脅威に対する対抗策である: </t>
+          <t>これは以下の脅威に対する対抗策である:</t>
           <!--
           <t>This is a countermeasure against the following threats:</t>
           -->
@@ -3634,26 +3634,28 @@
           informed by using techniques such as:</t>
           -->
 
-          <t><list style="symbols">
+          <t>
+            <list style="symbols">
               <t>
                 ユーザ同意のフォーム.
               </t>
 
               <t>
                 通知メッセージ (例えば, Eメール, SMS, &hellip;).
-                通知はフィッシング攻撃ベクトルにもなりうることに注意.
-                通知メッセージは, フィッシングメッセージをそこから派生できないようなものであるべきである.
+                通知はフィッシング攻撃の経路にもなりうることに注意.
+                通知メッセージは, アタッカーによく似たフィッシングメッセージを送信されないよう, 考慮すべきである.
               </t>
 
               <t>
-                アクティビティ/イベント ログ.
+                アクティビティ/イベントログ.
               </t>
 
               <t>
-                ユーザー自身によりケアのできるアプリケーションあるいはポータル.
+                ユーザーが自身でセキュリティ対策を行えるようなアプリケーションあるいはポータル.
               </t>
 
-            </list></t>
+            </list>
+          </t>
           <!--
           <t><list style="symbols">
               <t>User consent forms.</t>
@@ -3688,7 +3690,7 @@
                    title="Enforce Credential Storage Protection Best Practices">
             <t>
               管理者はクレデンシャルのストレージ保護に関する業界のベストプラクティスを採用すべきである
-              (例えば,  <xref target="OWASP"></xref> 参照).
+              (例えば, <xref target="OWASP"></xref> 参照).
               このようなプラクティスは以下のサブセクションの事項に限定されるものではない.
             </t>
             <!--
@@ -3723,7 +3725,7 @@
 
               <t><list style="symbols">
                   <t>
-                    攻撃サーフェスを減らすため, サーバーコードで利用するデータベース特権が最小限になっていることを確認すること.
+                    攻撃経路を減らすため, サーバーコードで利用するデータベース特権が最小限になっていることを確認すること.
                   </t>
                   <!--
                   <t>Ensure that server code is using the minimum database
@@ -3766,7 +3768,7 @@
               <t>
                 認可サーバーはクリアテキストでクレデンシャルを格納すべきではない.
                 典型的なアプローチは代わりにハッシュを格納するか, クレデンシャルを暗号化することである.
-                (ユーザーパスワードであるため)クレデンシャルが十分なエントロピーレベルを持っていない場合, オフライン辞書攻撃を困難にするためのソルトを追加することによってストレージが強固になる.
+                (ユーザーパスワードであるため) クレデンシャルが十分なエントロピーレベルを持っていない場合, オフライン辞書攻撃を困難にするためのソルトを追加することによってストレージが強固になる.
               </t>
               <!--
               <t>The authorization server should not store credentials in
@@ -3795,7 +3797,8 @@
               <t>
                 クライアントアプリケーションがクライアントクレデンシャルを安全に永続化していない場合, 攻撃者による取得のターゲットとなりやすい.
                 キーストアやデータベースのような暗号化永続機構を用いてクライアントクレデンシャルを格納すること.
-                クライアントクレデンシャルを直接クライアントコードに記述するとスキャニングに対し脆弱になる. またクライアントクレデンシャルの変更の管理が困難にもなる.
+                クライアントクレデンシャルを直接クライアントコードに記述するとスキャニングに対し脆弱になる.
+                またクライアントクレデンシャルの変更の管理が困難にもなる.
               </t>
               <!--
               <t>For client applications, insecurely persisted client
@@ -3810,7 +3813,7 @@
 
             <section title="Use of Asymmetric Cryptography">
               <t>
-                非対称暗号を用いれば, 認可サーバはクレデンシャルの管理の責務から開放される.
+                非対称暗号を用いれば, 認可サーバでクレデンシャル管理を行う必要はなくなる.
               </t>
               <!--
               <t>Usage of asymmetric cryptography will free the authorization
@@ -3839,9 +3842,9 @@
                      title="Use High Entropy for Secrets">
               <t>
                 人間によって利用されるのではないシークレット (例: クライアントシークレットやトークンハンドル) を生成するとき, 推測攻撃のリスクを軽減するために, 認可サーバーは合理的なレベルのエントロピーを含むように生成すべきである.
-                認可サーバーは, 128ビット以上の暗号論的に強固な乱数または擬似乱数シーケンスからトークンの値を生成するべきである
-                 (ベストカレントプラクティスとして <xref target="RFC4086"></xref> を参照).
-               </t>
+                認可サーバーは, 128ビット以上の暗号論的に強固な乱数または擬似乱数シーケンスからトークンの値を生成するべきである.
+                (本ドキュメント執筆時点のベストプラクティスとして <xref target="RFC4086"></xref> を参照)
+              </t>
               <!--
               <t>When creating secrets not intended for usage by human users
               (e.g., client secrets or token handles), the authorization server
