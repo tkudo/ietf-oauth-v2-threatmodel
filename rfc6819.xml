@@ -4149,10 +4149,42 @@
 
         <section title="Tokens (Access, Refresh, Code)">
           <section anchor="limit_scope" title="Limit Token Scope">
+            <t>
+              認可サーバーはトークンに関連付けられたスコープの縮小または制限を決定することもある.
+              この決定の基準は当文書のスコープ外である.
+              以下は例である:
+            </t>
+            <!--
             <t>The authorization server may decide to reduce or limit the
             scope associated with a token. The basis of this decision is out
             of scope; examples are:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアント固有のポリシー.
+                  例えば, パブリッククライアントにはより小さな権限のトークンのみ発行するなど.
+                </t>
+
+                <t>
+                  サーバー固有のポリシー.
+                  例えば, とてもセンシティブなサービスなど.
+                </t>
+
+                <t>
+                  リソースオーナー固有の設定.
+                </t>
+
+                <t>
+                  または, これらのポリシーや設定の組み合わせ.
+                </t>
+              </list>
+              認可サーバーはグラントタイプに応じて, 異なるスコープを許可することもある.
+              例えば, エンドユーザーと認可サーバーが直接対話することで得た認可 (つまり認可コードグラントタイプ) は, クライアントが「ユーザー名」/「パスワード」を認可サーバーに直接送信することで得た認可 (つまりリソースオーナーパスワードクレンデンシャルグラントタイプ) よりも信頼できるとみなすこともある.
+              この手法は以下の脅威の影響を減らすことができる: 
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>a client-specific policy, e.g., issue only less powerful
                 tokens to public clients,</t>
@@ -4169,7 +4201,23 @@
             might be considered more reliable than direct authorization via
             grant type "username"/"password". This means will reduce the
             impact of the following threats:</t>
+            -->
 
+            <t><list style="symbols">
+                <t>
+                  トークン漏洩
+                </t>
+
+                <t>
+                  悪意のあるソフトウェアへのトークン発行
+                </t>
+
+                <t>
+                  リソースオーナークレデンシャルフローで意図していない強い権限のトークンの発行
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>token leakage</t>
 
@@ -4178,19 +4226,52 @@
                 <t>unintended issuance of powerful tokens with resource
                 owner credentials flow</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="exp_time" title="Determine Expiration Time">
+            <t>
+              トークンは一般に適切な期間の経過後, 有効期限切れとなるべきである.
+              これにより, (署名のような) 他のセキュリティ手法の補完や強化を行うことができ, あらゆる種類のトークン漏洩の影響を減らすことができる.
+              トークン漏洩のリスクに応じて, (例えば決済トランザクションに対しては) 数分で有効期限切れとなり, (例えば連絡先情報への読み取りアクセスに対しては) 何時間も有効のままとなる.
+            </t>
+            <!--
             <t>Tokens should generally expire after a reasonable duration.
             This complements and strengthens other security measures (such as
             signatures) and reduces the impact of all kinds of token leaks.
             Depending on the risk associated with token leakage, tokens may
             expire after a few minutes (e.g., for payment transactions) or stay
             valid for hours (e.g., read access to contacts).</t>
+            -->
 
+            <t>
+              有効期間は下記のような様々な要因により決定される:
+            </t>
+            <!--
             <t>The expiration time is determined by several factors,
             including:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  トークン漏洩のリスクの大きさ
+                </t>
+
+                <t>
+                  基本的なアクセスを許可する期間
+                </t>
+
+                <t>
+                  アクセスの許可の変更が有効になるまでの期間
+                </t>
+
+                <t>
+                  攻撃者が有効なトークンを推測または生成するまでの所要時間
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>risk associated with token leakage,</t>
 
@@ -4202,12 +4283,36 @@
                 <t>time required for an attacker to guess or produce a valid
                 token.</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="short_exp_time" title="Use Short Expiration Time">
+            <t>
+              短い有効期間のトークンは以下の脅威に対する対策となる:
+            </t>
+            <!--
             <t>A short expiration time for tokens is a means of protection
             against the following threats:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  リプレイ
+                </t>
+
+                <t>
+                  トークン漏洩 (短い有効期間は影響を減らす)
+                </t>
+
+                <t>
+                  オンライン推測 (短い有効期間は成功の可能性を減らす)
+                </t>
+              </list>
+              注: トークンの有効期間を短くする場合, 認可サーバーとリソースサーバー間のより正確な時刻同期が要求される.
+              さらにいえば, 短い有効期間はより多くの (アクセストークンの) トークンリフレッシュを必要とするかもしれないし, エンドユーザによる (認可コードとリフレッシュトークンの) 認可処理の繰り返しに繋がるかもしれない.
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>replay</t>
 
@@ -4220,15 +4325,35 @@
             server. Furthermore, shorter duration may require more token
             refreshes (access token) or repeated end-user authorization
             processes (authorization "code" and refresh token).</t>
+            -->
           </section>
 
           <section anchor="one_time_usage"
                    title="Limit Number of Usages or One-Time Usage">
 
+            <t>
+              認可サーバーはトークンの利用回数を制限してもよい.
+              これにより以下の脅威を軽減することができる:
+            </t>
+            <!--
             <t>The authorization server may restrict the number of requests or
             operations that can be performed with a certain token. This
             mechanism can be used to mitigate the following threats:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  トークンのリプレイ
+                </t>
+
+                <t>
+                  推測
+                </t>
+              </list>
+              例えば, 認可サーバーがある認可コードの交換の試行を複数回観測した場合, 現在のリクエストだけでなく, その認可コードに関連づいた全てのアクセストークンを無効化することもありうる.
+              </t>
+            <!--
             <t><list style="symbols">
                 <t>replay of tokens</t>
 
@@ -4238,16 +4363,29 @@
             authorization server may want to revoke all access tokens granted
             based on the authorization "code" as well as reject the current
             request.</t>
+            -->
 
+            <t>
+              認可コードと同様に, アクセストークンも操作回数に制限があってもよい.
+              これは, クライアントアプリケーションを再認証し, 新たなアクセストークンを取得するためにリフレッシュトークンを使用することを強制するか, ユーザーも関与させてアクセストークンの再認可をクライアントに強制することになる.
+            </t>
+            <!--
             <t>As with the authorization "code", access tokens may also have a
             limited number of operations. This either forces client
             applications to re-authenticate and use a refresh token to
             obtain a fresh access token, or forces the client to
             re-authorize the access token by involving the user.</t>
+            -->
           </section>
 
           <section anchor="bind_token_rs"
                    title="Bind Tokens to a Particular Resource Server (Audience)">
+            <t>
+              マルチサービス環境にある認可サーバーは, 送信先として意図しているサーバーを明示的にトークン内に指定するなど, 異なるリソースサーバーに対して異なる内容のトークンを発行してもよい.
+              SAMLアサーション (<xref target="OASIS.saml-core-2.0-os"></xref> 参照) は, この目的のために Audience 要素を用いている.
+              この対抗策は以下の状況に対して使用される:
+            </t>
+            <!--
             <t>Authorization servers in multi-service environments may
             consider issuing tokens with different content to different
             resource servers and to explicitly indicate in the token the
@@ -4256,7 +4394,24 @@
             (see <xref target="OASIS.saml-core-2.0-os"></xref>) use the
             Audience element for this purpose. This countermeasure can be used
             in the following situations:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  このトークンは一つのリソースサーバーにのみ適用できるため, リプレイ試行の成功の影響を減らす.
+                </t>
+
+                <t>
+                  このトークンは指定されたリソースサーバーやクライアントでのみ利用できるため, 悪意のあるリソースサーバーやクライアントが自身宛のトークンを他のサーバーに対して悪用することを防ぐ.
+                  それを行っても他のサーバによって拒絶される.
+                </t>
+
+                <t>
+                  偽のリソースサーバーに対する有効なトークンの漏洩の影響を減らす.
+                </t>
+              </list></t>
+            <!--
             <t><list style="symbols">
                 <t>It reduces the impact of a successful replay attempt, since
                 the token is applicable to a single resource server only.</t>
@@ -4268,33 +4423,69 @@
                 <t>It reduces the impact of leakage of a valid token to a
                 counterfeit resource server.</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="endpoint_audience"
                    title="Use Endpoint Address as Token Audience">
+            <t>
+              トークンを取得するのにどのエンドポイントURLが用いられたかという情報を以って, リソースサーバーを示してもよい.
+              このようなトークンは (偽の) リソースサーバーを識別するエンドポイントURLを含むため, この手法は偽のリソースサーバーが (クライアントになりすまして) 要求していることを (正規のリソースサーバーが) 検出できる.
+              (訳注: 一文目の「endpoint URL」はトークンを取得するために用いられたということなので, 認可サーバーのトークンエンドポイントURLを示しているように読め, 二文目の「the endpoint URL of that server」については, ここで出てきているサーバーはリソースサーバーだけなのでリソースサーバーのエンドポイントURLを示すように読める. トークンエンドポイントURLが対応するリソースサーバー毎にユニークとなっており, トークンに含めるエンドポイントURLは, 認可サーバーで管理しているリソースサーバーのエンドポイントURLとすることで矛盾はしないかもしれないが不自然であるし, また別の脅威を想定する必要があるように思える. )
+            </t>
+            <!--
             <t>This may be used to indicate to a resource server which
             endpoint URL has been used to obtain the token. This measure will
             allow the detection of requests from a counterfeit resource server,
             since such a token will contain the endpoint URL of that
             server.</t>
+            -->
 
           </section>
 
           <section anchor="audience_token_scope"
                    title="Use Explicitly Defined Scopes for Audience and Tokens">
+            <t>
+              いくつかのデプロイでは, スコープはそれぞれ特定のリソースサーバーのみに関連付けられ, 明示的に定義したスコープを持つトークンのみを使用することを検討するかもしれない.
+              このアプローチは, リソースサーバーやクライアントが想定外の目的でトークンを利用するという攻撃を軽減することができる.
+            </t>
+            <!--
             <t>Deployments may consider only using tokens with explicitly
             defined scopes, where every scope is associated with a particular
             resource server. This approach can be used to mitigate attacks
             where a resource server or client uses a token for a different
             purpose than the one intended.</t>
+            -->
           </section>
 
           <section anchor="bind_token_client_id"
                    title="Bind Token to Client id">
+            <t>
+              認可サーバーはトークンを特定のクライアント識別子に結びつけることもありえる.
+              この識別子はトークン付きの全てのリクエストに対し検証されるべきである.
+              この手法は以下の目的で利用できる: 
+            </t>
+            <!--
             <t>An authorization server may bind a token to a certain client
             identifier. This identifier should be validated for every request
             with that token. This technique can be used to</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  トークン漏洩の検出
+                </t>
+
+                <t>
+                  トークン悪用の防止
+                </t>
+              </list>
+              注: クライアント識別子の検証は, ターゲットサーバーにクライアントの識別子を認証することを要求することもある.
+              この認証は, (例えば, 認可サーバー上に事前登録されたクライアント識別子とシークレットのような) トークンとは独立して管理されたシークレットを利用するか, 
+              あるいは (例えば, 暗号化されたトークンの中身の一部として) トークン自身と共に送ることで可能となる.
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>detect token leakage and</t>
 
@@ -4305,36 +4496,74 @@
             token (e.g., pre-registered client id/secret on authorization
             server) or sent with the token itself (e.g., as part of the
             encrypted token content).</t>
+            -->
           </section>
 
           <section anchor="signed_tokens" title="Sign Self-Contained Tokens">
+            <t>
+              改竄や偽のトークンの生成を検出するために, 自己完結型トークンは (例えば, ハッシュベースメッセージ認証コードやデジタル署名を用いて) 署名されるべきである.
+            </t>
+            <!--
             <t>Self-contained tokens should be signed in order to detect any
             attempt to modify or produce faked tokens (e.g., Hash-based Message
             Authentication Code or digital signatures).</t>
+            -->
           </section>
 
           <section anchor="enc_token" title="Encrypt Token Content">
+            <t>
+              自己完結型トークンは, 秘匿性やシステムの内部データを保護するために暗号化されるかもしれない.
+              トークンの書式に従い, (例えば共通鍵のような) 鍵がサーバノード間で流通されなければならないかもしれない.
+              トークンや暗号化の方法といった流通の方法を定義すべきである.
+            </t>
+            <!--
             <t>Self-contained tokens may be encrypted for confidentiality
             reasons or to protect system internal data. Depending on token
             format, keys (e.g., symmetric keys) may have to be distributed
             between server nodes. The method of distribution should be defined
             by the token and the encryption used.</t>
+            -->
           </section>
 
           <section anchor="assertion_format" title="Adopt a Standard Assertion Format">
+            <t>
+              アサーションベースのトークンデザインを実装しようするサービス提供者は, 標準のアサーションフォーマットを採用することを強く推奨する (例えば, SAML <xref target="OASIS.saml-core-2.0-os"></xref>や, JavaScript Object Notation Web Token (JWT) <xref target="OAuth-JWT"></xref>のような).
+            </t>
+            <!--
             <t>For service providers intending to implement an assertion-based
             token design, it is highly recommended to adopt a standard
             assertion format (such as SAML <xref
             target="OASIS.saml-core-2.0-os"></xref> or the
             JavaScript Object Notation Web Token (JWT) <xref
             target="OAuth-JWT"></xref>).</t>
+            -->
           </section>
         </section>
 
         <section anchor="access_tokens" title="Access Tokens">
+          <t>
+            アクセストークンを保護するために以下の手法が使われるべきである: 
+          </t>
+          <!--
           <t>The following measures should be used to protect access
           tokens:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                (クライアントアプリケーションからのみアクセス可能な) 一時的なメモリに保持すること.
+              </t>
+
+              <t>
+                安全なトランスポート (TLS) を用いて安全にトークンを受け渡すこと.
+              </t>
+
+              <t>
+                クライアントアプリケーションはサードパーティーとトークンを共有しないことを確認すること.
+              </t>
+            </list></t>
+          <!--
           <t><list style="symbols">
               <t>Keep them in transient memory (accessible by the client
               application only).</t>
@@ -4344,6 +4573,7 @@
               <t>Ensure that client applications do not share tokens with 3rd
               parties.</t>
             </list></t>
+          -->
         </section>
       </section>
 
