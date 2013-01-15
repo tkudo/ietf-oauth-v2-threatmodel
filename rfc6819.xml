@@ -2332,18 +2332,55 @@
           </section>
 
           <section title="Threat: Obtaining Authorization &quot;codes&quot; from Authorization Server Database">
+            <t>
+              認可サーバーがhandleとして認可コードをデータベースに保存した場合, この脅威が発生しうる.
+              アタッカーは, データベースへのアクセス権限を不正取得したり, SQLインジェクション攻撃を通じて, 認可サーバーのデータベース中から認可コードを取得できる可能性がある.
+            </t>
+            <!--
             <t>This threat is applicable if the authorization server stores
             authorization "codes" as handles in a database. An attacker may
             obtain authorization "codes" from the authorization server's
             database by gaining access to the database or launching a SQL
             injection attack. </t>
+            -->
 
+            <t>
+              影響: 全認可コードが漏洩し, おそらくさらにそれに紐づくredirect_uriとclient_idも漏洩する.
+            </t>
+            <!--
             <t>Impact: Disclosure of all authorization "codes",
             most likely along with the respective "redirect_uri" and "client_id"
             values.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クレデンシャルストレージを保護するためのベストプラクティスに従う.
+                  (<xref target="cred_storage_prot"></xref>)
+                </t>
+                <t>
+                  システムレベルのセキュリティ対策を行う.
+                  (<xref target="std_sys"></xref>)
+                </t>
+                <t>
+                  アクセストークンのハッシュ値のみを保存する.
+                  (<xref target="noclear"></xref>)
+                </t>
+                <t>
+                  標準的SQLインジェクション対策を行う.
+                  (<xref target="std_sql"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Best practices for credential storage protection should be
                 employed (<xref target="cred_storage_prot"></xref>).</t>
@@ -2357,18 +2394,61 @@
                 <t>Enforce standard SQL injection countermeasures
                 (<xref target="std_sql"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Online Guessing of Authorization &quot;code&quot;s">
+            <t>
+              アタッカーが正規の認可コード値を推測し, 推測値を "code" グラントとして用いてアクセストークンを取得する可能性がある.
+            </t>
+            <!--
             <t>An attacker may try to guess valid authorization "code" values
             and send the guessed code value using the grant type
             &bdquo;code&ldquo; in order to obtain a valid access token.</t>
+            -->
 
+            <t>
+              影響: 単一のアクセストークン, およびおそらくはそれと紐づいたリフレッシュトークンの漏洩・不正取得.
+            </t>
+            <!--
             <t>Impact: Disclosure of a single access token and probably also
             an associated refresh token.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  handleベーストークンは高エントロピーでなければならない.
+                  (<xref target="high_entropy"></xref>)
+                </t>
+                <t>
+                  assertionベーストークンは署名されるべきである.
+                  (<xref target="signed_tokens"></xref>)
+                </t>
+                <t>
+                  クライアント認証を行う.
+                  これによりアタッカーが推測しなければならない値が増える.
+                  (<xref target="depl_specific_secretes"></xref>)
+                </t>
+                <t>
+                  認可コードをリダイレクトURIと紐づける.
+                  これによりアタッカーが推測しなければならない値が増える.
+                  (<xref target="bind_code_redirect"></xref>)
+                </t>
+                <t>
+                  トークンの有効期間を短くする.
+                  (<xref target="short_exp_time"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Handle-based tokens must use high entropy
                 (<xref target="high_entropy"></xref>).</t>
@@ -2387,6 +2467,7 @@
                 <t>Use short expiry time for tokens
                 (<xref target="short_exp_time"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="mal_client"
