@@ -3460,15 +3460,15 @@
       <t>
         本セクションでは <xref target="threat_model"/> で述べた脅威を軽減するために推奨する対抗策について述べる.
       </t>
-      <!-- 
+      <!--
       <t>This section describes the countermeasures as recommended to mitigate
       the threats described in <xref target="threat_model"/>.</t>
       -->
       <section title="General">
         <t>
-         本セクションはすべてのOAuthコンポーネント (クライアント, リソースサーバー, トークンサーバーおよびユーザーエージェント) に対し一般に適用される考慮を対象とする.
+          本セクションでは, すべてのOAuthコンポーネント (クライアント, リソースサーバー, トークンサーバーおよびユーザーエージェント) に対し, 一般に適用可能な対策について考慮する.
         </t>
-        <!-- 
+        <!--
         <t>This section covers considerations that apply generally
         across all OAuth components (client, resource server, token server,
         and user agents).</t>
@@ -3480,7 +3480,7 @@
             OAuthはリクエストの完全性検証のための方式を提供するが, リクエストの秘匿性を保つための方式は提供しない.
             さらなる予防措置を行わない限り, 盗聴者はリクエストの中身にフルアクセスし, シークレットやトークンなどのリクエストの中身を用いて遮断やリプレイアタックを開始することが可能となる.
           </t>
-          <!-- 
+          <!--
           <t>This is applicable to all requests sent from the client to the
           authorization server or resource server. While OAuth provides a
           mechanism for verifying the integrity of requests, it provides no
@@ -3495,18 +3495,18 @@
             IPsec VPN <xref target="RFC4301"></xref> のような仮想プライベートネットワーク (VPN) も同様に考慮に値する.
             (訳注: 「transport-layer mechanisms such as TLS」は, 文脈から「transport-layer "security" mechanisms such as TLS」と見なした. )
           </t>
-          <!-- 
+          <!--
           <t>Attacks can be mitigated by using transport-layer mechanisms such
           as TLS <xref target="RFC5246"></xref>. A virtual private network
           (VPN), e.g., based on IPsec VPNs <xref target="RFC4301"></xref>, may
           be considered as well.</t>
           -->
-          
+
           <t>
             注: 当文書では各々のプロトコルエンティティ間のコネクションがend-to-endのTLSで保護されていることを想定している.
-            データセンターの境界などのようにTLSをオフロードすることによってこの想定から外れているデプロイは, これによって引き起こされる新たな (主に内部者による) 脅威に対する説明のために, この脅威モデルを改良しなければならない.
+            データセンターの境界などのようにTLSをオフロードすることによってこの想定から外れているデプロイは, これによって引き起こされる新たな (主に内部者による) 脅威に対処するために, この脅威モデルを改良しなければならない.
           </t>
-          <!-- 
+          <!--
           <t>Note: This document assumes end-to-end TLS protected connections
           between the respective protocol entities. Deployments deviating from
           this assumption by offloading TLS in between (e.g., on the data
@@ -3515,13 +3515,14 @@
           -->
 
           <t>
-            これは以下の脅威に対する対抗策である: 
+            これは以下の脅威に対する対抗策である:
           </t>
-          <!-- 
+          <!--
           <t>This is a countermeasure against the following threats:</t>
           -->
-          
-          <t><list style="symbols">
+
+          <t>
+            <list style="symbols">
               <t>
                 トークンエンドポイントやリソースサーバーのエンドポイントとの通信路上で得られたアクセストークンのリプレイ
               </t>
@@ -3544,8 +3545,9 @@
               <t>
                 ユーザーパスワードとクライアントシークレットのリプレイ
               </t>
-            </list></t>
-          <!-- 
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Replay of access tokens obtained on the token's endpoint or
               the resource server's endpoint</t>
@@ -3567,7 +3569,7 @@
             その目的は, 接続の確立の際にサーバーの完全修飾ドメイン名とサーバーから提示された公開鍵とを確実に結びつけることである
             (<xref target="RFC2818"></xref> 参照).
           </t>
-          <!-- 
+          <!--
           <t>HTTPS server authentication or similar means can be used to
           authenticate the identity of a server. The goal is to reliably bind
           the fully qualified domain name of the server to the public key
@@ -3581,7 +3583,7 @@
             このセキュリティ手法は, この目的においてクライアントが信頼している認証局 (CA) に依存している.
             クライアントはこれらの信頼するCAを慎重に選択すべきであり, 信頼するCAの証明書を格納するストレージを変更されないように保護すべきである.
           </t>
-          <!-- 
+          <!--
           <t>The client should validate the binding of the server to its
           domain name. If the server fails to prove that binding, the
           communication is considered a man-in-the-middle attack.
@@ -3592,7 +3594,7 @@
           -->
 
           <t>これは以下の脅威に対する対抗策である: </t>
-          <!-- 
+          <!--
           <t>This is a countermeasure against the following threats:</t>
           -->
 
@@ -3604,7 +3606,7 @@
               <t>偽のサーバーによるフィッシング</t>
             </list>
           </t>
-          <!-- 
+          <!--
           <t><list style="symbols">
               <t>Spoofing</t>
 
@@ -3625,7 +3627,7 @@
             ユーザーは恐らくある種の攻撃に対して, 認可サーバーよりも正しく認識することができる.
             認可プロセス時, 認可プロセス後, そしてユーザーが情報を得たいと思った時のいずれも, 下記のような手法を用いて情報の提示と交換を行うことができる:
           </t>
-          <!-- 
+          <!--
           <t>Transparency to the resource owner is a key element of the OAuth
           protocol. The user should always be in control of the authorization
           processes and get the necessary information to make informed
@@ -3655,9 +3657,9 @@
               <t>
                 ユーザー自身によりケアのできるアプリケーションあるいはポータル.
               </t>
-               
+
             </list></t>
-          <!-- 
+          <!--
           <t><list style="symbols">
               <t>User consent forms.</t>
 
