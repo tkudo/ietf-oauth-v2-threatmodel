@@ -3229,6 +3229,10 @@
           </section>
 
           <section title="Threat: DoS Attacks That Exhaust Resources">
+            <t>
+              認可コードやアクセストークンが十分なエントロピーを持っておらず, ユーザーの関与やユーザーごとの認可コード/トークン数の制限無しに自動的にアクセス許可を行う場合, アタッカーは認可リクエストを繰り返して認可サーバーの認可コード/アクセストークンプールを枯渇させることができる.
+            </t>
+            <!--
             <t>If an authorization server includes a nontrivial amount of
             entropy in authorization "codes" or access tokens (limiting the
             number of possible codes/tokens) and automatically grants either
@@ -3236,9 +3240,27 @@
             tokens per user, an attacker could exhaust the pool of
             authorization "codes" by repeatedly directing the user's browser to
             request authorization "codes" or access tokens.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  認可サーバーはユーザーごとに発行可能なアクセストークンに上限を設けるべきである.
+                </t>
+
+                <t>
+                  認可サーバーは認可コードに十分なエントロピーを持たせるべきである.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The authorization server should consider limiting the
                 number of access tokens granted per user.</t>
@@ -3246,6 +3268,7 @@
                 <t>The authorization server should include a nontrivial
                 amount of entropy in authorization "codes".</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="semi"
