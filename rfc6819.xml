@@ -3085,6 +3085,13 @@
           </section>
 
           <section title="Threat: Resource Owner Impersonation">
+            <t>
+              クライアントが保護リソースへのアクセスを要求する際, 通常認可フローではリソースオーナーの明示的なアクセス許可/拒否が行われる.
+              しかしながら, 不正クライアントが認可フローの詳細を把握し, プログラムによって認可フローに必要なリクエストを実行することも考えられる.
+              こうすることにより, クライアントはユーザー同意なしに被害者のリソースへのアクセス権限を得ることができる.
+              認可サーバーがユーザーインタラクションを必要としない認証手法を取ったり, 複数ページにまたがる認可フローを分割可能にしていると, このような攻撃に対して脆弱になる.
+            </t>
+            <!--
             <t>When a client requests access to protected resources, the
             authorization flow normally involves the resource owner's explicit
             response to the access request, either granting or denying access
@@ -3097,7 +3104,14 @@
             approval. An authorization server will be vulnerable to this
             threat if it uses non-interactive authentication mechanisms or
             splits the authorization flow across multiple pages.</t>
+            -->
 
+            <t>
+              不正クライアントは不可視HTMLユーザーエージェントを利用して認可サーバーが送信するHTMLフォームを中断し, 自動的に同様のHTTP POSTリクエストを実行する.
+              なお, このときアタッカーは認可サーバー上でリソースオーナーの認証済セッションを利用できる必要がある.
+              これは以下のような手段で実現可能となる.
+            </t>
+            <!--
             <t>The malicious client might embed a hidden HTML user agent,
             interpret the HTML forms sent by the authorization server, and
             automatically send the corresponding form HTTP POST requests. As a
@@ -3105,7 +3119,25 @@
             authorization process in the context of an already-authenticated
             session of the resource owner with the authorization server. There
             are different ways to achieve this:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  不正クライアントは, 該当デバイス上の外部ブラウザやクロスブラウザクッキーに残っている既存セッションを悪用することができる.
+                </t>
+
+                <t>
+                  不正クライアントは, まずユーザーに承認できる程度のscopeの認可を要求し, その後ブラウザに残されたセッションをこっそり悪用して他のscopeへのアクセスを得ることができる.
+                </t>
+
+                <t>
+                  その他に, アタッカーは認可サーバーのユーザーインタラクションを必要としないリソースオーナー認証メカニズムを悪用することもできる. (例: クライアント証明書など)
+                </t>
+              </list>
+              いずれのケースでも, 攻撃は被害者のデバイス上のユーザーエージェント, もしくはネイティブアプリケーションで実行される必要がある.
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The malicious client could abuse an existing session in an
                 external browser or cross-browser cookies on the particular
@@ -3123,22 +3155,64 @@
               </list> In all cases, such an attack is limited to clients
             running on the victim's device, either within the user agent or
             as a native app.</t>
+            -->
 
+            <t>
+              注: この攻撃はCSRF対策では防止できない.
+              アタッカーは認可サーバー自身で構築されたnonceなどを含むURLを「実行」しているに過ぎない.
+              (訳注: Cookieなどもすべて取られているという仮定であろう)
+            </t>
+            <!--
             <t>Please note: Such attacks cannot be prevented using CSRF
             countermeasures, since the attacker just "executes" the URLs as
             prepared by the authorization server including any nonce, etc.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              認可サーバーは自身のリスク分析に基づき, この脅威を検知および防止すべきかどうか決定すべきである.
+            </t>
+            <!--
             <t>Authorization servers should decide, based on an analysis of
             the risk associated with this threat, whether to detect and
             prevent this threat.</t>
+            -->
 
+            <t>
+              この攻撃を防ぐため, 認可サーバーは以下のように推測不可能な入力値を伴うユーザーインタラクションを強制することも考えられる.
+            </t>
+            <!--
             <t>In order to prevent such an attack, the authorization server
             may force a user interaction based on non-predictable input values
             as part of the user consent approval. The authorization server
             could</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  パスワード認証とユーザー同意を単一のフォームにする.
+                </t>
+
+                <t>
+                  CAPTCHAを用いる.
+                </t>
+
+                <t>
+                  なんらかの手段でリソースオーナーにOne-timeシークレットを送信し, それを利用させる.
+                  (テキストメッセージ, インスタントメッセージなどを利用)
+                </t>
+              </list>
+              その他に, リソースオーナーに不正アクセスを検知させるため, 認可サーバーがアクセス認可が行われた際にリソースオーナーに適切な手段で通知するという方法も考えられる.
+              (テキストメッセージ, インスタントメッセージ, emailなどを利用)
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>combine password authentication and user consent in a
                 single form,</t>
@@ -3151,6 +3225,7 @@
             detect abuse, the authorization server could notify the resource
             owner of any approval by appropriate means, e.g., text or instant
             message, or email.</t>
+            -->
           </section>
 
           <section title="Threat: DoS Attacks That Exhaust Resources">
