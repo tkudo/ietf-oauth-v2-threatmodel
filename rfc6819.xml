@@ -2605,21 +2605,60 @@
           </section>
 
           <section title="Threat: Authorization &quot;code&quot; Phishing">
+            <t>
+              悪意あるアプリケーションがクライアントサイトになりすまし, 認可コードを取得する可能性がある.
+              DNSやARPのなりすましがその要因となる.
+              このような脅威は, Webアプリケーション型のクライアントにあてはまる.
+              そのようなクライアントのリダイレクトURIは, ユーザのブラウザが動作するローカルホストではない別の場所を指すためである.
+            </t>
+            <!--
             <t>A hostile party could impersonate the client site and get
             access to the authorization "code". This could be achieved using DNS
             or ARP spoofing. This applies to clients, which are web
             applications; thus, the redirect URI is not local to the host where
             the user's browser is running.</t>
+            -->
 
+            <t>
+              影響: この脅威はWebアプリケーションにあてはまり, 認可コード, そして潜在的にはそれに紐づくアクセストークンおよびリフレッシュトークンの漏洩につながる.
+            </t>
+            <!--
             <t>Impact: This affects web applications and may lead to a
             disclosure of authorization "codes" and, potentially, the
             corresponding access and refresh tokens.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              このような攻撃を防ぐため, 以下のいずれかの対策を講じることを強く推奨する.
+            </t>
+            <!--
             <t>It is strongly recommended that one of the following
             countermeasures be utilized in order to prevent this attack:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアントのリダイレクトURIは, HTTPSで保護されたエンドポイントを指すべきである.
+                  またブラウザのサーバー認証機能を用いて, 確実にそのリダイレクトURIを認証すべきである.
+                  (<xref target="server_authn"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーはクライアント認証を要求するべきである.
+                  それにより認可コードと特定のクライアントとの紐付けが, 信頼できる方法で検証可能となる.
+                  (<xref target="bind_code_client_id"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The redirect URI of the client should point to an HTTPS-protected endpoint, and the browser should be utilized to
                 authenticate this redirect URI using server authentication
@@ -2631,15 +2670,32 @@
                 reliable way
                 (see <xref target="bind_code_client_id"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: User Session Impersonation">
+            <t>
+              悪意あるアプリケーションがクライアントサイトになりすまし, クライアント上のユーザーセッションを偽装する可能性がある.
+              DNSやARPのなりすましがその要因となる.
+              このような脅威は, Webアプリケーション型のクライアントにあてはまる.
+              そのようなクライアントのリダイレクトURIは, ユーザのブラウザが動作するローカルホストではない別の場所を指すためである.
+            </t>
+            <!--
             <t>A hostile party could impersonate the client site and
             impersonate the user's session on this client. This could be
             achieved using DNS or ARP spoofing. This applies to clients, which
             are web applications; thus, the redirect URI is not local to the
             host where the user's browser is running.</t>
+            -->
 
+            <t>
+              影響: ブラウザ経由でコールバックエンドポイントに送信される認可コードがアタッカーに漏洩する.
+              アタッカーは, そこでフローを中断し, 得られた認可コードを抜き出して自らクライアントに送ることで, 保護リソースへのアクセス権限を得る.
+              クライアントは渡された認可コードをそのままアクセストークンと交換し, 得られたアクセストークンを使って保護リソースアクセスを行う.
+              これによってアタッカーは被害者の管理下にある保護リソースを取得したり, それを書き換えたりすることで, なんらかの利益を得る.
+              (サードパーティーSNS上のログインボタンなどのように) OAuthが認証処理の委譲の為に用いられている場合, アタッカーは得られた認可コードを使って被害者としてクライアントにログインできる.
+            </t>
+            <!--
             <t>Impact: An attacker who intercepts the authorization "code" as it
             is sent by the browser to the callback endpoint can gain access to
             protected resources by submitting the authorization "code" to the
@@ -2652,13 +2708,35 @@
             implementation of a "Login" button on a third-party social network
             site), the attacker can use the intercepted authorization "code" to
             log into the client as the user.</t>
+            -->
 
+            <t>
+              注: 認可コードをアクセストークンと交換する際のクライアント認証は, この攻撃を防ぐためには利用できない.
+              このケースでは, トークンを取得するのはあくまで正規のクライアントである.
+            </t>
+            <!--
             <t>Note: Authenticating the client during authorization "code"
             exchange will not help to detect such an attack, as it is the
             legitimate client that obtains the tokens.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  エンドユーザーセッションの偽装を防ぐには, クライアントのリダイレクトURIは, HTTPSで保護されたエンドポイントを指すべきである.
+                  またブラウザのサーバー認証機能を用いて, 確実にそのリダイレクトURIを認証すべきである.
+                  (<xref target="server_authn"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>In order to prevent an attacker from impersonating the
                 end-user's session, the redirect URI of the client should
@@ -2666,6 +2744,7 @@
                 utilized to authenticate this redirect URI using server
                 authentication (see <xref target="server_authn"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="authz_code_leakage"
