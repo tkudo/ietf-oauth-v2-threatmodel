@@ -2947,13 +2947,27 @@
 
           <section anchor="section_csrf"
                    title="Threat: CSRF Attack against redirect-uri">
+            <t>
+              Cross-site request forgery (CSRF) は, Webサイトに信頼もしくは認証されたユーザーを通じてHTTPリクエストを実行させる, Webベースの攻撃である.
+              攻撃にはHTTPリダイレクトやHTMLフォームなどが用いられる.
+              OAuth認可フローに対するCSRF攻撃は, アタッカーがOAuthの保護リソースへのアクセス権限を取得する際に, ユーザー同意ステップをスキップすることを可能にする.
+            </t>
+            <!--
             <t>Cross-site request forgery (CSRF) is a web-based attack whereby
             HTTP requests are transmitted from a user that the web site trusts
             or has authenticated (e.g., via HTTP redirects or HTML forms).
             CSRF attacks on OAuth approvals can allow an attacker to obtain
             authorization to OAuth protected resources without the consent of
             the user.</t>
+            -->
 
+            <t>
+              この攻撃は認可コードフロー中でリダイレクトURIに対して行われる.
+              アタッカーは, 自身の保護リソースに対する認可を行い, 認可コードを取得する.
+              その後アタッカーは自身のデバイス上でクライアントへのリダイレクトを途中で止め, 被害者にそのリダイレクトリクエストを実行させる.
+              リダイレクトを受けたクライアントは, 認可サーバーからトークンを取得し, クライアント上の被害者セッションとそのトークンでアクセスできるリソースを紐づける.
+            </t>
+            <!--
             <t>This attack works against the redirect URI used in the
             authorization "code" flow. An attacker could authorize an
             authorization "code" to their own protected resources on an
@@ -2963,7 +2977,14 @@
             fetches the token(s) from the authorization server, and associates
             the victim's client session with the resources accessible using
             the token.</t>
+            -->
 
+            <t>
+              影響: 被害者はアタッカーの代理としてリソースアクセスを行う.
+              その栄養はアクセスされるリソースに依存するが, 例えば被害者がアタッカーのリソースとしてプライベートなデータをアップロードするケースなどが考えられる.
+              OAuthを3rd partyログインの為に用いている場合, クライアント上の被害者アカウントが外部Identity Provider上のアタッカーアカウントと紐づけられてしまい, アタッカーが別デバイス上で被害者としてクライアントにログインできるようになってしまう, といったケースも考えられる.
+            </t>
+            <!--
             <t>Impact: The user accesses resources on behalf of the attacker.
             The effective impact depends on the type of resource accessed. For
             example, the user may upload private items to an attacker's
@@ -2973,9 +2994,28 @@
             easily access the victim's data at the client by logging in from
             another device with his credentials at the external Identity
             Provider.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  認可リクエストとそのリダイレクトレスポンスを紐づけるため, stateパラメーターを利用すべきである.
+                  (<xref target="link_state_uasession"></xref>)
+                </t>
+
+                <t>
+                  クライアント開発者とエンドユーザーに, 信頼できないURLにアクセスすべきでないと教育するといったことも考えられる.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The "state" parameter should be used to link the
                 authorization request with the redirect URI used to deliver
@@ -2985,21 +3025,52 @@
                 <t>Client developers and end users can be educated to not
                 follow untrusted URLs.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Clickjacking Attack against Authorization">
+            <t>
+              Clickjackingとは, 不正なサイトが不可視iframe (<xref target="iFrame"></xref>) に対象サイトをロードし, 対象サイト上の重要なボタンに会うようにその下のレイヤーに偽ボタンを配置し, 被害者のクリックを誘導する攻撃である.
+              ユーザーが可視ボタンをクリックすると, 実際には不可視ページ上のボタンがクリックされる. (「認可」ボタンなど)
+            </t>
+            <!--
             <t>With clickjacking, a malicious site loads the target site in a
             transparent iFrame (see <xref target="iFrame"></xref>) overlaid on
             top of a set of dummy buttons that are carefully constructed to
             be placed directly under important buttons on the target site.
             When a user clicks a visible button, they are actually clicking a
             button (such as an "Authorize" button) on the hidden page.</t>
+            -->
 
+            <t>
+              影響: アタッカーはユーザーの認証クレデンシャル (訳注: ID & Passwordなど) やリソースアクセスを得る.
+            </t>
+            <!--
             <t>Impact: An attacker can steal a user's authentication
             credentials and access their resources.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  モダンブラウザでは, X-FRAME-OPTIONSヘッダーを利用して認可フロー中でiframeの利用を禁止することができる.
+                  (<xref target="clickjacking_xframe"></xref>)
+                </t>
+
+                <t>
+                  レガシーブラウザでは, JavaScript frame-busting (<xref target="Framebusting"></xref>) が利用できる.
+                  ただしこれはすべてのブラウザで動作するとは限らない.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>For newer browsers, avoidance of iFrames during
                 authorization can be enforced on the server side by using the
@@ -3010,6 +3081,7 @@
                 target="Framebusting"></xref>) techniques can be used but may
                 not be effective in all browsers.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Resource Owner Impersonation">
