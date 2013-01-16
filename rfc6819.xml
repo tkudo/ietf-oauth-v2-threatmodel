@@ -2749,6 +2749,11 @@
 
           <section anchor="authz_code_leakage"
                    title="Threat: Authorization &quot;code&quot; Leakage through Counterfeit Client">
+            <t>
+              この攻撃では, アタッカーは認可コードグラントタイプを悪用し, 別のユーザー (被害者) に認可サーバーへのログインおよび被害者自身のリソースへのアクセス許可を行わせ, 得られた認可コードをアタッカーのアカウントを使ってクライアントに渡す.
+              被害者によるリソースへのアクセス認可を, クライアントサイト上のアタッカーアカウントと紐づけることが, その目的である.
+            </t>
+            <!--
             <t>The attacker leverages the authorization "code" grant type in an
             attempt to get another user (victim) to log in, authorize access
             to his/her resources, and subsequently obtain the
@@ -2756,7 +2761,15 @@
             using the attacker's account. The goal is to associate an
             access authorization for resources of the victim with the
             user account of the attacker on a client site.</t>
+            -->
 
+            <t>
+              アタッカーは既存クライアントを悪用し, それを自身の悪意あるサイトと組み合わせて利用する.
+              これは被害者の「クライアントアプリケーションは特定のリソースサーバーへのアクセスを要求しているのだろう」という思い込みを利用した攻撃である.
+              被害者は正規クライアントから発行された正常なリクエストを目にするため, そのリクエストを受理するであろう.
+              そしてアタッカーは被害者が知らず知らずのうちに認可してしまった情報へのアクセス権限を得るのである.
+            </t>
+            <!--
             <t>The attacker abuses an existing client application and combines
             it with his own counterfeit client web site. The attacker depends
             on the victim expecting the client application to request access to
@@ -2764,9 +2777,56 @@
             from an expected application, approves the request. The attacker
             then uses the victim's authorization to gain access to the
             information unknowingly authorized by the victim.</t>
+            -->
 
+            <t>
+              この攻撃は以下のフローで行われる.
+            </t>
+            <!--
             <t>The attacker conducts the following flow:</t>
+            -->
 
+            <t>
+              <list style="numbers">
+                <t>
+                  アタッカーはクライアントサイト (もしくはクライアントアプリケーション) にアクセスし, 特定のリソースサーバーへのデータアクセスを行う.
+                  クライアントWebサイトはそれを受けて, リソースサーバーに対応する認可サーバーへ, 認可リクエストを行う.
+                  ここでアタッカーはこの認可プロセスを途中で止め, 認可サーバーの認可エンドポイントに自身のコントロール下にあるWebサイト上のリダイレクトURIを付与する.
+                </t>
+
+                <t>
+                  アタッカーは改竄された認可エンドポイントURLを (emailやブログ記事中のリンクなどを経由して) 被害者に開かせる.
+                  被害者に該当URLを開かせる手段については, ここでは特に限定しない.
+                </t>
+
+                <t>
+                  リンクをクリックすることで, 被害者は認証を要求され, その後クライアントによるリソースアクセスへの同意を求められる.
+                </t>
+
+                <t>
+                  認可プロセスが完了すると, 認可サーバーはユーザーエージェントを元のクライアントではなくアタッカーのWebサイトにリダイレクトさせる.
+                </t>
+
+                <t>
+                  それによりアタッカーはなんらかの方法で該当認可コードを得る.
+                  その具体的な手段についてはここでは触れない.
+                </t>
+
+                <t>
+                  その後アタッカーは対象Webサイト (もしくはアプリケーション) の本来のリダイレクトURIに得られた認可コードを付与し, 自身のユーザーエージェントでそのURLをロードする.
+                  これにより認可コードは元のクライアントサイト (もしくはアプリケーション) に渡される.
+                </t>
+
+                <t>
+                  クライアントサイトは得られた認可コードをアクセストークンと交換し, それを自身のサイト上のアタッカーのアカウントと紐づける.
+                </t>
+
+                <t>
+                  以上により, アタッカーは該当クライアントサイトを通じて被害者のリソースへのアクセス権限を得る.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="numbers">
                 <t>The attacker accesses the client web site (or application)
                 and initiates data access to a particular resource server. The
@@ -2807,12 +2867,50 @@
                 <t>The attacker may now access the victim's resources using
                 the client site.</t>
               </list></t>
+            -->
 
+            <t>
+              影響: アタッカーはクライアントサイト上の自身のアカウントを通じて被害者のリソースへのアクセス権限を得る.
+            </t>
+            <!--
             <t>Impact: The attacker gains access to the victim's resources as
             associated with his account on the client site.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  アタッカーは認可フローを途中でインターセプトするため, 外部サイトのリダイレクトURIを利用する必要がある.
+                  よって認可サーバーが, 認可コードをその認可リクエスト時に指定されたリダイレクトURIと紐づけ, そのリダイレクトURIを用いてトークンエンドポイントで再び送られてくるリダイレクトURIを検証することで, この攻撃を検知することができる.
+                  (<xref target="bind_code_redirect"></xref>)
+                </t>
+
+                <t>
+                  さらに, 認可サーバーはリダイレクトURIの事前登録およびその検証を必須とすることもできる. (<xref target="val_redirect"></xref>)
+                  これによりさらに早い段階で不正クライアントへの認可コード漏洩を検知することができる.
+                </t>
+
+                <t>
+                  ネイティブアプリケーションの場合, 認可コードとクライアントIDの紐付けに加え, 各インスタンスごとに固有のクライアントID & シークレットを用いることもできる.
+                  (<xref target="bind_code_client_id"></xref>, <xref target="depl_specific_secretes"></xref>)
+                  アタッカーはインスタンス固有のシークレットへアクセスできないため, アタッカーが認可コードをトークンと交換することは不可能になる.
+                </t>
+
+                <t>
+                  クライアントは, この攻撃に対して脆弱なフローの代わりに, implicitグラントタイプやリソースオーナーパスワードグラントタイプなどの別フローを用いることもできる.
+                  (<xref target="implicit_flow"></xref>, <xref target="pwd_flow"></xref>)
+                  (訳注: implicitグラントタイプやリソースオーナーパスワードグラントタイプは, 別の攻撃に対して脆弱な一面があることに注意すること)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The attacker will need to use another redirect URI for
                 its authorization process rather than the target web site
@@ -2844,6 +2942,7 @@
                 resource owner password credentials (see <xref
                 target="pwd_flow"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="section_csrf"
