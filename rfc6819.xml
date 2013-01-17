@@ -3510,6 +3510,12 @@
         </section>
 
         <section anchor="implicit_flow" title="Implicit Grant">
+          <t>
+            implicitグラントタイプフローでは, アクセストークンがリダイレクトURIのフラグメントを通じて直接クライアントに渡される.
+            HTTPユーザーエージェントはHTTPサーバーにフラグメント部分を送らないので, トークンはリダイレクトURIが指し示す対象には送られないと想定される.
+            よってクライアント・ユーザーエージェント間の通信経路上でアクセストークンを盗聴したりHTTPリファラーヘッダー経由でトークンが漏洩することはない.
+          </t>
+          <!--
           <t>In the implicit grant type flow, the access token is directly
           returned to the client as a fragment part of the redirect URI. It
           is assumed that the token is not sent to the redirect URI target,
@@ -3517,33 +3523,83 @@
           servers. Thus, an attacker cannot eavesdrop the access token on this
           communication path, and the token cannot leak through HTTP referrer
           headers.</t>
+          -->
 
           <section title="Threat: Access Token Leak in Transport/Endpoints">
+            <t>
+              トークンがアタッカーに盗聴される可能性がある.
+              トークンはリダイレクトURIのフラグメントを通じてサーバーからクライアントに渡される.
+              この通信がセキュアで無い場合, トークンが漏洩する.
+            </t>
+            <!--
             <t>This token might be eavesdropped by an attacker. The token is
             sent from the server to the client via a URI fragment of the
             redirect URI. If the communication is not secured or the endpoint
             is not secured, the token could be leaked by parsing the returned
             URI.</t>
+            -->
 
+            <t>
+              影響: アタッカーがトークンの持つ権限を得る.
+            </t>
+            <!--
             <t>Impact: The attacker would be able to assume the same rights
             granted by the token.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                認可サーバーは (TLSを用いるなど) 認可サーバーからクライアントへのレスポンスの秘匿性を保証すべきである.
+                (<xref target="conf_requests"></xref>)
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The authorization server should ensure confidentiality
                 (e.g., using TLS) of the response from the authorization server
                 to the client (see <xref target="conf_requests"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Access Token Leak in Browser History">
+            <t>
+              アタッカーはブラウザ履歴からトークンを取得できる.
+              これにはアタッカーが特定のデバイスにアクセスできる必要がある.
+            </t>
+            <!--
             <t>An attacker could obtain the token from the browser's history.
             Note that this means the attacker needs access to the particular
             device.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  トークンの有効期間を短くする. (<xref target="short_exp_time"></xref>)
+                  トークンのscopeを狭めることも, この攻撃の影響を軽減する可能性がある. (<xref target="limit_scope"></xref>)
+                </t>
+
+                <t>
+                  レスポンスをキャッシュさせない.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Use short expiry time for tokens (see <xref
                 target="short_exp_time"></xref>). Reduced scope of the
@@ -3552,30 +3608,77 @@
 
                 <t>Make responses non-cacheable.</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="mal_client2"
                    title="Threat: Malicious Client Obtains Authorization">
+            <t>
+              不正クライアントが詐欺によりトークンを受け取る.
+            </t>
+            <!--
             <t>A malicious client could attempt to obtain a token by
             fraud.</t>
+            -->
 
+            <t>
+              クライアント認証の実施を除いては, <xref target="mal_client"></xref> と同様の対策が可能である.
+            </t>
+            <!--
             <t>The same countermeasures as for <xref
             target="mal_client"></xref> are applicable, except client
             authentication.</t>
+            -->
           </section>
 
           <section title="Threat: Manipulation of Scripts">
+            <t>
+              アタッカーがクライアントWebサーバーになりすまし, クライアント (のスクリプト) を改竄もしくは置き換える可能性がある.
+              これはDNS/ARP Spoofingにより可能になる.
+              Webブラウザ上にスクリプト言語で実装されたクライアントが対象となる.
+            </t>
+            <!--
             <t>A hostile party could act as the client web server and replace
             or modify the actual implementation of the client (script). This
             could be achieved using DNS or ARP spoofing. This applies to
             clients implemented within the web browser in a scripting
             language.</t>
+            -->
 
+            <t>
+              影響: アタッカーはユーザーのクレデンシャルを取得し, ユーザーのアイデンティティをも乗っ取り可能であろう.
+            </t>
+            <!--
             <t>Impact: The attacker could obtain user credential information
             and assume the full identity of the user.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  認可サーバーはスクリプトを配信するサーバーを認証すべきである.
+                  (<xref target="server_authn"></xref>)
+                </t>
+
+                <t>
+                  クライアントは通信系路上でスクリプトが改竄されていないことを保証すべきである.
+                  (<xref target="conf_requests"></xref>)
+                </t>
+
+                <t>
+                  ユーザーごとのone-timeシークレット (client_secretなど) を導入し, スクリプトがサーバーからロードされてから短期間だけ, そのスクリプトだけがそのシークレットを利用できるようにすることも考えられる.
+                  これにより, アタッカーがクライアントサイドのスクリプトをコピーして改竄時に使い回す場合の効率を下げることができる.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The authorization server should authenticate the server
                 from which scripts are obtained
@@ -3591,6 +3694,7 @@
                 the effectiveness of copying client-side scripts for re-use in
                 an attacker's modified code.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: CSRF Attack against redirect-uri">
