@@ -4929,22 +4929,38 @@
       </section>
 
       <section title="Authorization Server">
+        <t>
+          当セクションではOAuth認可サーバのエンドポイントに関する考慮について述べる. 
+        </t>
+        <!--
         <t>This section describes considerations related to the OAuth
         authorization server endpoint.</t>
+        -->
 
         <section title="Authorization &quot;codes&quot;">
           <section anchor="automatic_code_revocation"
                    title="Automatic Revocation of Derived Tokens If Abuse Is Detected">
+            <t>
+              認可サーバーが (例えば, 認可コードのような) 認可グラントの交換の試行を複数回観測した場合, その認可グラントに関連づいた全てのトークンを無効化することもありうる. 
+            </t>
+            <!--
             <t>If an authorization server observes multiple attempts to redeem
             an authorization grant (e.g., such as an authorization "code"), the
             authorization server may want to revoke all tokens granted based
             on the authorization grant.</t>
+            -->
           </section>
         </section>
 
         <section anchor="refresh_tokens" title="Refresh Tokens">
           <section anchor="restricted_refresh"
                    title="Restricted Issuance of Refresh Tokens">
+            <t>
+              認可サーバーは, 適切なポリシーに基づいて, リフレッシュトークンを発行しないと決断することもありうる. 
+              リフレッシュトークンは長期間有効なクレデンシャルのため, 窃取される可能性が高いかもしれない. 
+              例えば, 認可サーバはこのようなトークンを安全に格納できないと考えられるクライアントに対し, リフレッシュトークンの発行を拒否することもありうる. 
+            </t>
+            <!--
             <t>The authorization server may decide, based on an appropriate
             policy, not to issue refresh tokens. Since refresh tokens are
             long-term credentials, they may be subject to theft.
@@ -4952,25 +4968,50 @@
             authorization server does not trust a client to securely store
             such tokens, it may refuse to issue such a client a refresh
             token.</t>
+            -->
           </section>
 
           <section anchor="binding_refresh_client_id"
                    title="Binding of Refresh Token to &quot;client_id&quot;">
+            <t>
+              認可サーバーは全てのリフレッシュトークンについて、意図している発行先のクライアントの識別子とマッチしているかの確認処理をすべきである. 
+              認可サーバーは同じ "client_id" がアクセストークンのリフレッシュ要求の全てに存在することをチェックすべきである. 
+              (例えばコンフィデンシャルクライアントのように) 可能な場合, 認可サーバーは個々のクライアントを認証すべきである. 
+            </t>
+            <!--
             <t>The authorization server should match every refresh token to
             the identifier of the client to whom it was issued. The
             authorization server should check that the same "client_id" is
             present for every request to refresh the access token. If possible
             (e.g., confidential clients), the authorization server should
             authenticate the respective client.</t>
+            -->
 
+            <t>
+              これはリフレッシュトークンの窃取や漏洩に対する対抗策である. 
+            </t>
+            <!--
             <t>This is a countermeasure against refresh token theft or
             leakage.</t>
+            -->
 
+            <t>
+              注: このリフレッシュトークンと "client_id" の対応は認可なしに変更されないように保護されるべきである. 
+            </t>
+            <!--
             <t>Note: This binding should be protected from unauthorized
             modifications.</t>
+            -->
           </section>
 
           <section anchor="refresh_replace" title="Refresh Token Rotation">
+            <t>
+              リフレッシュトークンローテーションは, 異なるアプリケーションやデバイスから同時に同じリフレッシュトークンが利用されることを自動的に検出し阻止することを意図している. 
+              この事態はクライアントからトークンが盗まれ, それを攻撃者と正当なクライアントの両方が用いた場合に発生する. 
+              基本的な考えは, 古いリフレッシュトークンを用いたアクセストークン取得の試行を検出するために, 全てのリフレッシュリクエストの度にリフレッシュトークンの値を変更することである. 
+              認可サーバーは攻撃者と正当なクライアントのどちらがアクセスしようとしているのか判断できないため, このようなアクセス試行があった場合, 有効なリフレッシュトークンとこれに関連したアクセス認可の両方を無効化する. 
+            </t>
+            <!--
             <t>Refresh token rotation is intended to automatically detect and
             prevent attempts to use the same refresh token in parallel from
             different apps/devices. This happens if a token gets stolen from
@@ -4982,26 +5023,63 @@
             legitimate client is trying to access, in case of such an access
             attempt the valid refresh token and the access authorization
             associated with it are both revoked.</t>
+            -->
 
+            <t>
+              OAuth仕様は, グラントタイプが "refresh_token" のときでも, 認可サーバーが新たなリフレッシュトークンをトークンレスポンスとして返すのを可能とすることでこの方法をサポートしている. 
+            </t>
+            <!--
             <t>The OAuth specification supports this measure in that the
             token's response allows the authorization server to return a new
             refresh token even for requests with grant type
             "refresh_token&ldquo;.</t>
+            -->
 
+            <t>
+              注: この方法は, 現在有効なリフレッシュトークンの使用状況を確認しなければならないため, クラスター環境では問題を引き起こす可能性がある. 
+              このような環境では, 他の方法の方がより適切であるかもしれない. 
+            </t>
+            <!--
             <t>Note: This measure may cause problems in clustered environments,
             since usage of the currently valid refresh token must be ensured.
             In such an environment, other measures might be more
             appropriate.</t>
+            -->
           </section>
 
           <section anchor="refresh_revocation" title="Revocation of Refresh Tokens">
+            <t>
+              認可サーバーは, クライアントまたはエンドユーザーによるリフレッシュトークン無効化の明示的なリクエストを許可してもよい. 
+              トークンの無効化方法は <xref target="OAuth-REVOCATION"></xref> で仕様化されている. 
+            </t>
+            <!--
             <t>The authorization server may allow clients or end users to
             explicitly request the invalidation of refresh tokens. A mechanism
             to revoke tokens is specified in <xref
             target="OAuth-REVOCATION"></xref>.</t>
+            -->
 
+            <t>
+              これは以下に対する対抗策となる: 
+            </t>
+            <!--
             <t>This is a countermeasure against:</t>
+            -->
 
+            <t><list style="symbols">
+                <t>
+                  デバイスの盗難
+                </t>
+
+                <t>
+                  リソースオーナーのなりすまし
+                </t>
+
+                <t>
+                  信用できなくなったクライアントアプリケーション
+                </t>
+              </list></t>
+            <!--
             <t><list style="symbols">
                 <t>device theft,</t>
 
@@ -5009,9 +5087,16 @@
 
                 <t>suspected compromised client applications.</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="device_id" title="Device Identification">
+            <t>
+              認可サーバーは認証クレデンシャルとデバイス識別子の対応を要求してもよい. 
+              International Mobile station Equipment Identity <xref target="IMEI"></xref> はこのような識別子の一例である. またOS固有の識別子も存在する. 
+              特定のデバイスからトークンが窃取されたことを検出するために, 認可サーバーはユーザークレデンシャルの認証時にこのような識別子を含めることができる. 
+            </t>
+            <!--
             <t>The authorization server may require the binding of
             authentication credentials to a device identifier.
             The International Mobile Station Equipment
@@ -5021,12 +5106,24 @@
             authorization server could include such an identifier when
             authenticating user credentials in order to detect token theft
             from a particular device.</t>
+            -->
 
+            <t>
+              注: いかなる実装においてもデバイス識別子を用いることのプライバシーへの影響の可能性を考慮すべきである. 
+            </t>
+            <!--
             <t>Note: Any implementation should consider potential privacy
             implications of using device identifiers.</t>
+            -->
           </section>
 
           <section anchor="clickjacking_xframe" title="X-FRAME-OPTIONS Header">
+            <t>
+              X-FRAME-OPTIONS ヘッダー (<xref target="X-Frame-Options"></xref> 参照) をサーバーサイドから指定することによって, iframeでの表示を回避することを最近のブラウザに対しては強制することができる. 
+              このヘッダーは "DENY" と "SAMEORIGIN" という2種類の値を持つことができ, フレーム表示を一切禁止することと, 異なるオリジンのサイトでは禁止することをそれぞれ意味する. 
+              "ALLOW-FROM" という値を指定することができるブラウザも存在し, この場合は, iframeでの表示を許可する信頼できるオリジンのリストも併せて指定する. 
+            </t>
+            <!--
             <t>For newer browsers, avoidance of iFrames can be enforced on the
             server side by using the X-FRAME-OPTIONS header (see <xref
             target="X-Frame-Options"></xref>). This header can
@@ -5034,12 +5131,25 @@
             framing or any framing by sites with a different origin,
             respectively. The value "ALLOW-FROM" specifies a list of
             trusted origins that iFrames may originate from.</t>
+            -->
 
+            <t>
+              これは以下の脅威に対する対抗策である: 
+            </t>
+            <!--
             <t>This is a countermeasure against the following threat:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>クリックジャッキング攻撃</t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Clickjacking attacks</t>
               </list></t>
+            -->
           </section>
         </section>
 
