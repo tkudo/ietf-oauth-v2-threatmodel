@@ -3274,12 +3274,26 @@
           <section anchor="semi"
                    title="Threat: DoS Using Manufactured Authorization &quot;codes&quot;"
                    toc="default">
+            <t>
+              ボットネットを持つアタッカーであれば, "http://" で始まるリダイレクトURIを収集し, それらにランダムな認可コードを付与してアクセスすることで, 認可サーバーに大量のHTTPSコネクションを集中させることができる.
+              (訳注: クライアントのリダイレクトURIは "http://" であり, 認可サーバーの認可エンドポイントは "https://" である点がポイント)
+              これは認可サーバーに対するDoSアタックになりうる.
+            </t>
+            <!--
             <t>An attacker who owns a botnet can locate the redirect URIs of
             clients that listen on HTTP, access them with random
             authorization "codes", and cause a large number of HTTPS
             connections to be concentrated onto the authorization server.
             This can result in a DoS attack on the authorization server.</t>
+            -->
 
+            <t>
+              この攻撃は, クライアントがCSRF対策を行ったりstateパラメーターを利用していたとしても可能である. (<xref target="section_csrf"></xref>)
+              CSRF対策が行われている場合, アタッカーは正規のCSRFコードやstateパラメーターを取得するため, 追加のHTTPリクエストを行えばよい.
+              追加のHTTPリクエストが必要になることで, アタッカーは2倍のコストを必要とするが, HTTPSとHTTPのコスト比が2倍以上であれば, アタッカーは認可サーバーに対してDoSアタックを成立させることができる.
+              (<xref target="SSL-Latency"></xref> によってHTTPS/HTTPのコスト比は約3.5倍となる)
+            </t>
+            <!--
             <t>This attack can still be effective even when CSRF defense/the
             "state" parameter (see <xref target="section_csrf"></xref>) is
             deployed on the client side. With such a defense, the attacker
@@ -3290,11 +3304,36 @@
             estimated to be around 3.5x at <xref target="SSL-Latency"></xref>),
             the attacker still achieves a magnification of resource
             utilization at the expense of the authorization server.</t>
+            -->
 
+            <t>
+              影響: 認可コードフローのこの特徴によりアタッカーが得るメリットには以下のようなものがある.
+            </t>
+            <!--
             <t>Impact: There are a few effects that the attacker can
             accomplish with this OAuth flow that they cannot easily achieve
             otherwise.</t>
+            -->
 
+            <t>
+              <list style="numbers">
+                <t>
+                  Connection Laundering: 正規クライアントが攻撃者と認可サーバーの間に存在するため, 認可サーバーがアタッカーの身元を知るのは困難である.
+                  そのためアタッカーのマシンに対するrate limitも困難である.
+                  もちろんアタッカーはTorなどの匿名化システムを利用してConnection Launderingを行うこともできるが, その効果は匿名化に用いるシステムによって異なる.
+                  一方で, 潜在的に多くのOAuthクライアントがこの攻撃に利用される可能性がある.
+                  (訳注: "Connection Laundering" に対する適切な訳語が見つからないが, 「身元を隠して攻撃すること」というニュアンス)
+                </t>
+
+                <t>
+                  非対称なリソース利用: アタッカーはHTTPコネクションに必要なコストを負担し, HTTPSコネクションに必要なコストを認可サーバーに与えることができる.
+                  複数クライアントにまたがったHTTPSコネクションの発生タイミングも, 比較的簡単にコントロールすることができる.
+                  もちろんHTTPのWebページに認可サーバーのHTTPS URLをロードすriframeを仕込み, ユーザーをそのWebページに誘導するなどして同様の攻撃を行うこともできるが, その場合攻撃タイミングのコントロールは困難であろう.
+                </t>
+              </list>
+              対抗策:
+            </t>
+            <!--
             <t><list style="numbers">
                 <t>Connection laundering: With the clients as the relay
                 between the attacker and the authorization server, the
@@ -3321,7 +3360,25 @@
                 simultaneously visit a particular site under the attacker's
                 control.</t>
               </list>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  これは完全な対抗策ではないが, クライアントはCSRF対策を行った上で暗号論的擬似乱数生成器により生成されたstateパラメーターを利用すべきである.
+                  そしてクライアントはCSRFトークンおよびstateパラメーターの検証が終わってから認可サーバーにアクセスすべきである.
+                </t>
+
+                <t>
+                  クライアントがシングルサインオンプロトコルやパスワード認証などでユーザーを認証しているのであれば, 不正な認可コードを一定以上入力してきたユーザーのアカウントを一時的に停止すべきである.
+                </t>
+
+                <t>
+                  認可サーバーは不正な認可コードが送信されたことを示すエラーレスポンスを返し, 一定以上そのようなリクエストを行うクライアントに対してはrate limitやコネクション拒否などの対応を行うべきである.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Though not a complete countermeasure by themselves, CSRF
                 defense and the "state" parameter created with secure random
@@ -3341,15 +3398,29 @@
                 rate-limit or disallow connections from clients whose number of
                 invalid requests exceeds a threshold.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Code Substitution (OAuth Login)">
+            <t>
+              アタッカーは被害者のアイデンティティを用いてアプリケーションやWebサイトにログインすることも考えられる.
+              アイデンティティ情報をOAuthにより保護されたサービスのAPIに頼っていると, それが脆弱性につながることがあるのである.
+              これは「ソーシャルログイン」と呼ばれるシナリオで散見されるパターンである.
+            </t>
+            <!--
             <t>An attacker could attempt to log into an application or web
             site using a victim's identity. Applications relying on identity
             data provided by an OAuth protected service API to login users are
             vulnerable to this threat. This pattern can be found in so-called
             "social login" scenarios.</t>
+            -->
 
+            <t>
+              前提条件として, リソースサーバーがユーザーのアイデンティティを提供するAPIを持っている必要がある.
+              クライアントは, OAuthのアクセストークンを使ってこの「アイデンティティAPI」にアクセスし, そのレスポンスに含まれる識別子を使ってユーザーを識別する.
+              クライアントはこの一連の操作を持ってユーザーが認証されたものとして扱う.
+            </t>
+            <!--
             <t>As a prerequisite, a resource server offers an API to obtain
             personal information about a user that could be interpreted as
             having obtained a user identity. In this sense, the client is
@@ -3359,7 +3430,18 @@
             look up its internal user account data (login). The client
             assumes that, because it was able to obtain information about the
             user, the user has been authenticated.</t>
+            -->
 
+            <t>
+              クライアントが認可コードグラントタイプを利用している場合, アタッカーはクライアントが利用しているのと同じIdentity Provider (IdP) から, ターゲットとなる被害者の認可コードを取得する必要がある.
+              このためアタッカーは, 被害者に対して, 同じIdPを通じて悪意あるアプリへログインするよう誘導する.
+              (このアプリはIdPにとっては正規クライアントである可能性がある)
+              それを受けてIdPはアイデンティティAPIへのアクセス権限を含む認可コードを発行する.
+              悪意あるアプリケーションはその認可コードをアタッカーに送り, アタッカーはそれを受けてターゲットとなるクライアントへのログインフローを開始し, 認可レスポンスに含まれる認可コードを被害者のものに置き換える.
+              リソースサーバーに関して言えばaudienceは正常であるため, クライアントは受け取った認可コードをアクセストークンと交換し, アイデンティティAPIにアクセスする.
+              しかしながらアイデンティティAPIのレスポンスには被害者の識別子が含まれるため, アタッカーはターゲットクライアント上の被害者のアカウントにログインできる.
+            </t>
+            <!--
             <t>If the client uses the grant type "code", the attacker needs to
             gather a valid authorization "code" of the respective victim from
             the same Identity Provider used by the target client application.
@@ -3379,12 +3461,38 @@
             by the identity API is determined by the identity in the access
             token (issued based on the victim's code), the attacker is logged
             into the target application under the victim's identity.</t>
+            -->
 
+            <t>
+              影響: アタッカーは特定のアプリケーションおよびそのアプリケーション内のユーザーデータにアセクセスできる.
+            </t>
+            <!--
             <t>Impact: The attacker gains access to an application and
             user-specific data within the application.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  すべてのクライアントは, 認可コードをアクセストークンと交換する際, 必ずクライアントIDを提示しなければならない.
+                  認可サーバーはその認可コードがそのクライアントに対して発行されたものかどうかを検証しなければならない.
+                  可能であればクライアント認証も行うことが望ましい.
+                </t>
+
+                <t>
+                  クライアントは認証の為にはOpenID (<xref target="OPENID"></xref>) やSAML (<xref target="OASIS.sstc-saml-bindings-1.1"></xref>) といったそれに適したプロトコルを利用すべきである.
+                  両プロトコルとも, クライアントに関するaudience制約をサポートしている.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>All clients must indicate their client ids with every
                 request to exchange an authorization "code" for an access token.
@@ -3397,6 +3505,7 @@
                 target="OASIS.sstc-saml-bindings-1.1"></xref>) to implement
                 user login. Both support audience restrictions on clients.</t>
               </list></t>
+            -->
           </section>
         </section>
 
