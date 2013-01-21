@@ -5368,10 +5368,41 @@
 
         <section anchor="client_aa"
                  title="Client Authentication and Authorization">
+          <t>
+            <xref target="sec_features"/> (Security Features) で述べたように, クライアントは以下のような様々な目的で識別, 認証, 認可される.
+          </t>
+          <!--
           <t>As described in <xref target="sec_features"/> (Security Features),
           clients are identified, authenticated, and authorized for several
           purposes, such as to:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                一連のリクエストが同じクライアントで実行されているか照合する.
+              </t>
+
+              <t>
+                認可サーバーによってクライアントが認識されていることをユーザーに示す.
+              </t>
+
+              <t>
+                認可サーバーやリソースサーバー上の機能へのクライアントのアクセスを認可する.
+              </t>
+
+              <t>
+                分析や統計のためにクライアント識別子をログファイルに記録する.
+              </t>
+            </list>
+            クライアントタイプ毎に機能や特性が異なるため, 上記の目的を達成する方法も複数ある.
+            これらの方法について当セクションで述べる.
+            認可サーバー提供者はセキュリティポリシーとクライアントのデプロイについて注意し, それに従って適切に取り扱うべきである.
+            例えば一つの例として, 全てのクライアントは信頼できず安全ではないとみなして取り扱うといったようなことが挙げられるだろう.
+            その対極として, サービス提供者は全てのクライアントのインストールを管理者が個々に有効化することによって, ソフトウェアパッケージのアイデンティティに対する信頼性と, このクライアントがインストールされた環境のセキュリティを確保するといった例が挙げられる.
+            これら2つの例の間の中間的なアプローチもいくつも考えられる.
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Collate requests to the same client,</t>
 
@@ -5395,14 +5426,29 @@
           in the identity of the software package and the security of the
           environment in which the client is installed. There are
           several approaches in between.</t>
+          -->
 
           <section anchor="dont_issue"
                    title="Don't Issue Secrets to Clients with Inappropriate Security Policy">
+            <t>
+              認可サーバーはシークレットを保護できないクライアント (パブリッククライアント) に対してシークレットを発行すべきではない.
+              これはクライアントが強固に認証されたと認可サーバーが取り扱ってしまう可能性を減らす.
+            </t>
+            <!--
             <t>Authorization servers should not issue secrets to clients that
             cannot protect secrets ("public" clients). This reduces the
             probability of the server treating the client as strongly
             authenticated.</t>
+            -->
 
+            <t>
+              例えば, あるネイティブアプリケーションの全てのインストールで共有される単一のクライアント識別子とシークレットを生成することは, あまりよくない.
+              このようなシナリオでは, アプリケーションマーケットのような配布チャネルを通じて, 開発者からそのアプリケーションを利用する全てのエンドユーザのデバイスに対してシークレットを伝えなければならない.
+              アプリケーションのソースコードや関連のリソースバンドルに埋め込まれたシークレットは, リバースエンジニアリングに対しては無力である.
+              次に, このようなシークレットを無効化すると, そのアプリケーションの全てのインストールが即座に動作しなくなってしまうため, 無効化することができない.
+              さらに, 認可サーバーはクライアント識別子を実際には信用できないため, そのクライアントの信頼性をエンドユーザに示すことは危険だろう.
+            </t>
+            <!--
             <t>For example, it is of limited benefit to create a single client
             id and secret that are shared by all installations of a native
             application. Such a scenario requires that this secret must be
@@ -5415,26 +5461,54 @@
             of work. Moreover, since the authorization server cannot really
             trust the client's identifier, it would be dangerous to indicate
             to end users the trustworthiness of the client.</t>
+            -->
 
+            <t>
+              以下のセクションで述べるように, 妥当なセキュリティレベルを達成する他の方法がある:
+            </t>
+            <!--
             <t>There are other ways to achieve a reasonable security level, as
             described in the following sections.</t>
+            -->
           </section>
 
           <section anchor="forced_user_consent"
                    title="Require User Consent for Public Clients without Secret">
+            <t>
+              認可サーバーはパブリッククライアントに対し自動認可を許すべきではない.
+              認可サーバーは個々のクライアント識別子を発行するかもしれないが, 全ての認可処理はエンドユーザーによる承認を必要とすべきである.
+              シークレットなしのクライアントは, 以下の脅威に対する対抗策である:
+            </t>
+            <!--
             <t>Authorization servers should not allow automatic authorization
             for public clients. The authorization server may issue an
             individual client id but should require that all authorizations
             are approved by the end user. For clients without secrets, this is
             a countermeasure against the following threat:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  パブリッククライアントアプリケーションのなりすまし.
+                </t>
+              </list></t>
+            <!--
             <t><list style="symbols">
                 <t>Impersonation of public client applications.</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="client_id_redirect"
                    title="Issue a &quot;client_id&quot; Only in Combination with &quot;redirect_uri&quot;">
+            <t>
+              認可サーバーは "client_id" の発行と共に, その "client_id" に対し事前設定されたクライアント個別の "redirect_uri" を関連付けるかもしれない.
+              そして, 異なるリダイレクトURIを持つ認可リクエストを受けた場合は自動的に拒否する.
+              もしくは, 認可サーバーは認可リクエストにどのようなリダイレクトURIが設定されていたとしてもそれを無視し, 代わりに既知の事前設定されたリダイレクトURIに対して常にリダイレクトすべきである.
+              これはシークレットを持たないクライアントにおける以下の脅威に対する対抗策である:
+            </t>
+            <!--
             <t>The authorization server may issue a "client_id" and bind the
             "client_id"
             to a certain pre-configured "redirect_uri". Any authorization
@@ -5445,22 +5519,48 @@
             redirect to the well-known pre-configured redirect URI. This is
             a countermeasure for clients without secrets against the following
             threats:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クロスサイトスクリプティング攻撃
+                </t>
+
+                <t>
+                  パブリッククライアントアプリケーションのなりすまし
+                </t>
+              </list></t>
+            <!--
             <t><list style="symbols">
                 <t>Cross-site scripting attacks</t>
 
                 <t>Impersonation of public client applications</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="depl_specific_secretes"
                    title="Issue Installation-Specific Client Secrets">
+            <t>
+              認可サーバーは, ある一つのクライアント (つまりソフトウェアパッケージ) について, インストール毎に異なるクライアント識別子とシークレットを発行するかもしれない.
+              このようなアプローチは, "public" クライアントを "confidential" クライアントに変える効果があるだろう.
+            </t>
+            <!--
             <t>An authorization server may issue separate client identifiers
             and corresponding secrets to the different installations of a
             particular client (i.e., software package). The effect of such an
             approach would be to turn otherwise "public" clients back into
             "confidential" clients.</t>
+            -->
 
+            <t>
+              ウェブアプリケーションにとっては, これは一つの "client_id" とソフトウェアパッケージがインストールされているウェブサイト毎に異なる一つの "client_id" と "client_secret" のペアを作ることを意味するだろう.
+              そして, その個々のサイトの提供者はウェブサイトのセットアップの際に, 認可サーバーにクライアント識別子とシークレットを要求することになるだろう.
+              これは, そのウェブサイトのリダイレクトURIやウェブサイトURL, その他の有用な属性の検証を可能とするだろう.
+              このウェブサイトの提供者はそのサイト上でのクライアントシークレットのセキュリティを確保しなければならない.
+            </t>
+            <!--
             <t>For web applications, this could mean creating one "client_id"
             and "client_secret" for each web site on which a software package
             is installed. So, the provider of that particular site could
@@ -5470,13 +5570,33 @@
             such as redirect URI, web site URL, and whatever else
             proves useful. The web site provider has to ensure the security of
             the client secret on the site.</t>
+            -->
 
+            <t>
+              ネイティブアプリケーションにとっては, あるアプリケーションの様々なデバイス上における全てのコピーは異なるインストールであるため, より複雑である.
+              このシナリオではインストール固有のシークレットとして, 以下のどちらかのパターンで "client_id" と "client_secret" を取得する必要が出てくる:
+            </t>
+            <!--
             <t>For native applications, things are more complicated because
             every copy of a particular application on any device is a
             different installation. Installation-specific secrets in this
             scenario will require obtaining a "client_id" and "client_secret" either
             </t>
+            -->
 
+            <t>
+              <list style="numbers">
+                <t>
+                  アプリケーションマーケットからのダウンロードプロセス中
+                </t>
+
+                <t>
+                  デバイスへのインストール中
+                </t>
+              </list>
+              いずれのアプローチもクライアント識別子とシークレットを発行するための自動機構が必要となるであろうが, OAuthでは現状その機構を定義していない.
+            </t>
+            <!--
             <t><list style="numbers">
                 <t>during the
                 download process from the application market, or</t>
@@ -5485,7 +5605,14 @@
               </list>Either approach will require an automated mechanism for
             issuing client ids and secrets, which is currently not defined by
             OAuth.</t>
+            -->
 
+            <t>
+              一つ目のアプローチはアプリケーションの真正性に対するある程度の信頼が確保できるが, 二つ目のオプションはクライアントの属性の検証ではなくインストールの真正性のみが確保される.
+              しかしこれは少なくとも, 様々なリプレイ攻撃を防止する助けになるだろう.
+              さらに, インストール固有のクライアント識別子とシークレットは, 特定のインストールに対する全てのリフレッシュトークンの選択的な無効化を一度で行うことを可能とする.
+            </t>
+            <!--
             <t>The first approach would allow the achievement of a
             certain level of trust in the authenticity of the application,
             whereas the second option only allows the authentication of the
@@ -5494,10 +5621,20 @@
             prevent several replay attacks. Moreover, installation-specific
             "client_ids" and secrets allow the selective revocation of all
             refresh tokens of a specific installation at once.</t>
+            -->
           </section>
 
           <section anchor="val_redirect"
                    title="Validate Pre-Registered &quot;redirect_uri&quot;">
+            <t>
+              認可サーバーは全てのクライアントに "redirect_uri" を登録することを要求すべきであり, その "redirect_uri" は <xref target="RFC6749"></xref> で定義された完全なURIであるべきである.
+              この登録の方法については当ドキュメントの対象外である.
+              OAuthのコア仕様のとおり, エンドユーザー認可エンドポイントへそれぞれの "client_id" と共に送信されるリダイレクトURIは, 登録されているリダイレクトURIと合致していなければならない.
+              それが合致していなかった場合, 認可サーバーはその受信したGETリクエストは攻撃者によって送信されたものとみなし, 拒絶するべきである.
+              注: 認可サーバーはこのような認可リクエストのリダイレクトURIにユーザーエージェントをリダイレクトすべきではない.
+              事前登録された "redirect_uri" を検証することは, 以下の脅威に対する対抗策となる:
+            </t>
+            <!--
             <t>An authorization server should require all clients to register
             their "redirect_uri", and the "redirect_uri" should be the full URI as
             defined in <xref target="RFC6749"></xref>. The way that this
@@ -5511,7 +5648,30 @@
             of such an authorization request. Validating the
             pre-registered "redirect_uri" is a countermeasure against the
             following threats:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  偽のウェブサイトへの認可コードの漏洩:
+                  これは, エンドユーザーが最初に認可エンドポイントにリダイレクトされてきた際に認可サーバーによって攻撃の試行の検出を可能とする.
+                  (<xref target="authz_code_leakage"></xref>)
+                </t>
+
+                <t>
+                  クライアントのリダイレクトエンドポイントを通じたオープンリダイレクタ攻撃.
+                  (<xref target="open_redirector_client"></xref>)
+                </t>
+
+                <t>
+                  認可サーバーのリダイレクトエンドポイントを通じたオープンリダイレクタフィッシング攻撃.
+                  (<xref target="open_redirector"></xref>)
+                </t>
+              </list>
+              この手法の根底にある想定は, 認可コードを取得するには攻撃者がその他のリダイレクトURIを使用する必要が出てくることである.
+              実装者は, 攻撃者がこのセキュリティ手法を回避するために被害者のデバイスに対してなりすまし攻撃を行う可能性を検討するかもしれない.
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Authorization "code" leakage through counterfeit web site:
                 allows authorization servers to detect attack attempts after the
@@ -5529,7 +5689,15 @@
             access to the authorization "code". Deployments might consider the
             possibility of an attacker using spoofing attacks to a victim's
             device to circumvent this security measure.</t>
+            -->
 
+            <t>
+              注: クライアントの事前登録は (手動で処理する) デプロイではスケールしないかもしれない.
+              または (まだ仕様化されていない) 動的クライアント登録を必要とするかもしれない.
+              動的クライアント登録がない場合, 事前登録された "redirect_uri" は開発・設定時のデプロイに紐づけられたクライアントでのみ有効に動作する.
+              即時の動的なリソースサーバーのディスカバリーが必要な場合は, この事前登録 "redirect_uri" ではもはや実現可能ではないかもしれない.
+            </t>
+            <!--
             <t>Note: Pre-registering clients might not scale in some
             deployments (manual process) or require dynamic client
             registration (not specified yet). With the lack of dynamic client
@@ -5538,43 +5706,84 @@
             development/configuration time. As
             soon as dynamic resource server discovery is required, the
             pre-registered "redirect_uri" may no longer be feasible.</t>
+            -->
           </section>
 
           <section anchor="client_secret_revocation"
                    title="Revoke Client Secrets">
+            <t>
+              認可サーバーは漏洩したシークレットの悪用を防止するため, クライアントのシークレットを無効化するかもしれない.
+            </t>
+            <!--
             <t>An authorization server may revoke a client's secret in order
             to prevent abuse of a revealed secret.</t>
+            -->
 
+            <t>
+              注: この手段では, 対象のクライアントに発行された認可コードやリフレッシュトークンも即時にすべて無効化するだろう.
+              これは対象のネイティブアプリケーションやウェブアプリケーションの複数のデプロイで使用されているクライアント識別子やシークレットに意図しない影響を与えるかもしれない.
+            </t>
+            <!--
             <t>Note: This measure will immediately invalidate any
             authorization "code" or refresh token issued to the respective
             client. This might unintentionally impact client identifiers
             and secrets used across multiple deployments of a particular
             native or web application.</t>
+            -->
 
+            <t>
+              これは以下に対する対抗策である
+            </t>
+            <!--
             <t>This a countermeasure against:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  プライベートクライアントの漏洩したクライアントシークレットの悪用
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Abuse of revealed client secrets for private clients</t>
               </list></t>
+            -->
           </section>
 
           <section anchor="strong_client_authn"
                    title="Use Strong Client Authentication (e.g., client_assertion/client_token)">
+            <t>
+              クライアントアサーション <xref target="OAuth-ASSERTIONS"></xref> のような代替の認証方式を使用することによって, "client_secret" の流通が不要となる.
+              これは, 安全な秘密鍵ストアや認証プロセス中にクライアントアサーションの発行者によって指定されたその他の追加の認証システムの使用が必要となるかもしれない.
+            </t>
+            <!--
             <t>By using an alternative form of authentication such as client
             assertion <xref target="OAuth-ASSERTIONS"></xref>, the need to
             distribute a "client_secret" is eliminated. This may require
             the use of a secure private key store or other supplemental
             authentication system as specified by the client assertion issuer
             in its authentication process.</t>
+            -->
           </section>
         </section>
 
         <section title="End-User Authorization">
+          <t>
+            当セクションではエンドユーザーの関与する認可フローに関する注意点について述べる.
+          </t>
+          <!--
           <t>This section includes considerations for authorization flows
           involving the end user.</t>
+          -->
 
           <section anchor="automatic_processing"
                    title="Automatic Processing of Repeated Authorizations Requires Client Validation">
+            <t>
+              クライアントがクライアントシークレットによる認証や, または署名された認証アサーション証明書 (<xref target="strong_client_authn"></xref>) や事前登録されたリダイレクトURIの検証 (<xref target="val_redirect"></xref>) のようなその他の認証メカニズムによる認証を受けていないとき, 認可サーバーは繰り返しの認可を自動処理すべきではない.
+            </t>
+            <!--
             <t>Authorization servers should NOT automatically process repeat
             authorizations where the client is not authenticated through a
             client secret or some other authentication mechanism such as a
@@ -5582,10 +5791,17 @@
             (<xref target="strong_client_authn"></xref>) or
             validation of a pre-registered redirect URI
             (<xref target="val_redirect"></xref>).</t>
+            -->
           </section>
 
           <section anchor="informed_decisions"
                    title="Informed Decisions Based on Transparency">
+            <t>
+              認可サーバーはエンドユーザーに認可プロセスで何が起き, 結果がどうなるかを明確に説明すべきである.
+              例えば, ユーザーはどのようなアクセス権をどのくらいの期間クライアントに与えようとしているかを理解すべきである.
+              またサーバーがそのクライアントの属性 (ウェブサイトURLやセキュリティポリシー) について確実に証明できるかどうかをユーザーに明らかにすべきである.
+            </t>
+            <!--
             <t>The authorization server should clearly explain to the end user
             what happens in the authorization process and what the
             consequences are. For example, the user should understand what
@@ -5593,10 +5809,18 @@
             should also be obvious to the user whether the server is able to
             reliably certify certain client properties (web site URL, security
             policy).</t>
+            -->
           </section>
 
           <section anchor="validation_end_user"
                    title="Validation of Client Properties by End User">
+            <t>
+              認可のプロセスでは, ユーザーは典型的にはクライアントからの認可のリクエストの承認を求められる.
+              認可サーバーによって認識されているクライアントの名前とユーザーが利用しているウェブサイトやアプリケーションの名前が適合しているかどうかなど, クライアントの属性の検証にエンドユーザーが関与できるため, これは重要なセキュリティメカニズムである.
+              この手法は特に認可サーバーがクライアントを認証できない状況のときに有用である.
+              これは以下に対する対抗策である:
+            </t>
+            <!--
             <t>In the authorization process, the user is typically asked to
             approve a client's request for authorization. This is an important
             security mechanism by itself because the end user can be involved
@@ -5606,21 +5830,54 @@
             especially helpful in situations where the authorization server is
             unable to authenticate the client. It is a countermeasure
             against:</t>
+            -->
 
-            <t><list style="symbols">
-                <t>A malicious application</t>
+            <t>
+              <list style="symbols">
+                <t>
+                  悪意のあるアプリケーション
+                </t>
 
-                <t>A client application masquerading as another client</t>
+                <t>
+                  他のクライアントに成り済ますクライアントアプリケーション
+                </t>
               </list></t>
+              <!--
+              <t><list style="symbols">
+                  <t>A malicious application</t>
+
+                  <t>A client application masquerading as another client</t>
+                </list></t>
+              -->
           </section>
 
           <section anchor="bind_code_client_id"
                    title="Binding of Authorization &quot;code&quot; to &quot;client_id&quot;">
+            <t>
+              認可サーバーは全ての認可コードをエンドユーザー認可プロセスを開始したクライアントの識別子と紐づけるべきである.
+              この手法は以下に対する対抗策である.
+            </t>
+            <!--
             <t>The authorization server should bind every authorization "code"
             to the id of the respective client that initiated the end-user
             authorization process. This measure is a countermeasure
             against:</t>
+            -->
 
+            <t><list style="symbols">
+                <t>
+                  異なるクライアントクレデンシャルを用いた認可コードのリプレイ.
+                  なぜなら攻撃者は認可コードをトークンに交換するために他の "client_id" を使用することができないため.
+                </t>
+
+                <t>
+                  認可コードのオンライン推測
+                </t>
+              </list>
+              注: この紐づけは認可なしに変更されないように保護されるべきである
+              (例えば, 保護メモリ および／または セキュアデータベースを使用する).
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Replay of authorization "codes" with different client
                 credentials, since an attacker cannot use another "client_id"
@@ -5630,10 +5887,16 @@
               </list>Note: This binding should be protected from unauthorized
             modifications (e.g., using protected memory and/or a secure
             database).</t>
+            -->
           </section>
 
           <section anchor="bind_code_redirect"
                    title="Binding of Authorization &quot;code&quot; to &quot;redirect_uri&quot;">
+            <t>
+              認可サーバーは全ての認可コードをエンドユーザー認可プロセスでクライアントへのリダイレクトの宛先として使用される実際のリダイレクトURIと紐づけできるようにすべきである.
+              この紐づけは, クライアントが認可コードをアクセストークンに交換しようとした際に, 検証されるべきである.
+             攻撃者が認可コードをアクセストークンに交換する際に別のリダイレクトURIを使用することができないため, この方法は偽のウェブサイトへの認可コードの漏洩に対する対抗策となる.
+            </t>
             <t>The authorization server should be able to bind every
             authorization "code" to the actual redirect URI used as the
             redirect
