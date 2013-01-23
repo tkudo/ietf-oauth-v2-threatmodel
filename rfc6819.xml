@@ -592,7 +592,7 @@
 
         <section title="Scope">
           <t>
-            scopeは, scopeは特定のトークンに紐づき, リソースサーバー, リソース, およびリソースへの操作に関するアクセス認可を示す.
+            scopeは, 特定のトークンに紐づき, リソースサーバー, リソース, およびリソースへの操作に関するアクセス認可を示す.
             scopeは, OAuthにおいてアクセストークンの持つ権限を明示的に示す手段となる.
             scopeは, 認可サーバーとエンドユーザーが, 比較的セキュアでなく信頼度の低いと考えられるOAuthクライアントに対して, リソースへのアクセス権限を制限・制御するために用いられる.
             クライアントは必要に応じてトークンの権限を狭めるためだけにscopeを用いることができる.
@@ -1759,7 +1759,7 @@
           <t>
             <list style="symbols">
               <t>
-                ユーザーに対して要求されたscope (リソースおよびパーミッシュン) についての分かりやすい説明を行う.
+                ユーザーに対して要求されたscope (リソースおよびパーミッション) についての分かりやすい説明を行う.
                 (<xref target="informed_decisions"></xref>)
               </t>
               <t>
@@ -5522,7 +5522,7 @@
           <section anchor="binding_refresh_client_id"
                    title="Binding of Refresh Token to &quot;client_id&quot;">
             <t>
-              認可サーバーは全てのリフレッシュトークンについて、意図している発行先のクライアントの識別子とマッチしているかの確認処理をすべきである.
+              認可サーバーは全てのリフレッシュトークンについて, 意図している発行先のクライアントの識別子とマッチしているかの確認処理をすべきである.
               認可サーバーは同じ "client_id" がアクセストークンのリフレッシュ要求の全てに存在することをチェックすべきである.
               (例えばコンフィデンシャルクライアントのように) 可能な場合, 認可サーバーは各リクエストにおいてクライアントを認証すべきである.
             </t>
@@ -6232,6 +6232,7 @@
               この紐づけは, クライアントが認可コードをアクセストークンに交換しようとした際に, 検証されるべきである.
              攻撃者が認可コードをアクセストークンに交換する際に別のリダイレクトURIを使用することができないため, この方法は偽のウェブサイトへの認可コードの漏洩に対する対抗策となる.
             </t>
+            <!--
             <t>The authorization server should be able to bind every
             authorization "code" to the actual redirect URI used as the
             redirect
@@ -6242,6 +6243,7 @@
             through counterfeit web sites, since an attacker cannot use another
             redirect URI to exchange an authorization "code" into a
             token.</t>
+            -->
           </section>
         </section>
       </section>
