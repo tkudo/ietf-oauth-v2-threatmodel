@@ -4133,14 +4133,43 @@
           </section>
 
           <section title="Threat: Obtaining User Passwords on Transport">
+            <t>
+              アタッカーが通信を盗聴してユーザーのパスワードを盗むことも考えられる.
+            </t>
+            <!--
             <t>An attacker could attempt to eavesdrop the transmission of
             end-user credentials with the grant type &bdquo;password&ldquo;
             between the client and server.</t>
+            -->
 
+            <t>
+              影響: 1人のエンドユーザーのパスワード漏洩
+            </t>
+            <!--
             <t>Impact: Disclosure of a single end-user's password.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  リクエストの秘匿性を保証する.
+                  (<xref target="conf_requests"></xref>)
+                </t>
+
+                <t>
+                  平文でクレデンシャルを送信することのない認証手段を用いる.
+                  (HMACなど)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Ensure confidentiality of requests
                 (<xref target="conf_requests"></xref>).</t>
@@ -4149,35 +4178,107 @@
                 sending of plaintext credentials over the wire
                 (e.g., Hash-based Message Authentication Code).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Obtaining User Passwords from Authorization Server Database">
+            <t>
+              データベースへの不正アクセスやSQLインジェクション攻撃などにより, アタッカーが認可サーバーのデータベースから有効なユーザー名とパスワードのペアを盗み出すことも考えられる.
+            </t>
+            <!--
             <t>An attacker may obtain valid username/password combinations
             from the authorization server's database by gaining access to the
             database or launching a SQL injection attack.</t>
+            -->
 
+            <t>
+              影響: 全ユーザーのユーザー名 & パスワードペアの漏洩.
+              これは, 同じクレデンシャルを他サービスで利用しているケースなどでは, 認可サーバーのドメインを超えて影響を与える.
+            </t>
+            <!--
             <t>Impact: Disclosure of all username/password combinations. The
             impact may exceed the domain of the authorization server, since
             many users tend to use the same credentials on different
             services.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クレデンシャルストレージ保護のためのベストプラクティスに従う.
+                  (<xref target="cred_storage_prot"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Enforce credential storage protection best practices
                 (<xref target="cred_storage_prot"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Online Guessing">
+            <t>
+              アタッカーが正規のユーザー名 & パスワードペアを推測し, passwordグラントとして利用することも考えられる.
+            </t>
+            <!--
             <t>An attacker may try to guess valid username/password
             combinations using the grant type "password&ldquo;.</t>
+            -->
 
+            <t>
+              影響: 1人のユーザー名 & パスワードペアの漏洩.
+            </t>
+            <!--
             <t>Impact: Revelation of a single username/password
             combination.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  セキュアパスワードポリシーに従う.
+                  (<xref target="pwd_policy"></xref>)
+                </t>
+
+                <t>
+                  アカウントロック. (<xref target="lock_accounts"></xref>)
+                </t>
+
+                <t>
+                  tar pitを利用する. (<xref target="tar_pit"></xref>)
+                </t>
+
+                <t>
+                  CAPTCHAを利用する. (<xref target="captchas"></xref>)
+                </t>
+
+                <t>
+                  passwordグラントを利用しない.
+                </t>
+
+                <t>
+                  クライアント認証という他の認証要素によって, 攻撃を邪魔することもある.
+                  (<xref target="client_aa"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Utilize secure password policy
                 (<xref target="pwd_policy"></xref>).</t>
@@ -4194,15 +4295,22 @@
                 target="client_aa"></xref>) will provide another
                 authentication factor and thus hinder the attack.</t>
               </list></t>
+            -->
           </section>
         </section>
 
         <section title="Client Credentials">
+          <t>
+            クライアントクレデンシャル (<xref target="RFC6749"></xref> Section 3) は, クライアント認証のための手段 (client secretのマッチングなど) と紐づいた識別子 (secretではない) により構成される.
+            このグラントタイプに対する脅威は, <xref target="pwd_flow"></xref> で述べられたものと類似している.
+          </t>
+          <!--
           <t>Client credentials (see <xref target="RFC6749"></xref>,
           Section 3) consist of an identifier (not secret) combined with an
           additional means (such as a matching client secret) of
           authenticating a client. The threats to this grant type are similar
           to those described in <xref target="pwd_flow"></xref>.</t>
+          -->
         </section>
       </section>
 
