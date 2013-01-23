@@ -3698,6 +3698,13 @@
           </section>
 
           <section title="Threat: CSRF Attack against redirect-uri">
+            <t>
+              CSRF攻撃 (<xref target="section_csrf"></xref>) はimplicitグラントフロー中のリダイレクトURIに対しても実行可能である.
+              アタッカーは, 事前に自身のリソースに対するアクセストークンを取得しておき, そのトークンを含むリダイレクトURIを構築することができる.
+              その後ユーザーを騙してそのリダイレクトURIにアクセスさせることに成功した場合, クライアントにはそれを防ぐ手だてはない.
+              被害者は, そのクライアントに対して発行されたアタッカーのアクセストークンと, 紐づけられることになるであろう.
+            </t>
+            <!--
             <t>CSRF attacks (see <xref target="section_csrf"></xref>) also
             work against the redirect URI used in the implicit grant flow.
             An attacker could acquire an access token to their own protected
@@ -3706,7 +3713,14 @@
             following the redirect URI and the client does not have
             protection against this attack, the user may have the attacker's
             access token authorized within their client.</t>
+            -->
 
+            <t>
+              影響: ユーザーはアタッカーのリソースへのアクセスを行う.
+              その影響はリソースの種類によって異なるが, 例えばユーザーがプライベートなデータをアタッカーの管理下のリソースにアップロードしてしまうことなどが考えられる.
+              OAuthが3rd-partyログインに使われている場合であれば, IdP上のアタッカーのアカウントとクライアント上の被害者アカウントが紐づけられてしまい, アタッカーが他デバイスからでも簡単にクライアント上の被害者アカウントにログインできてしまうことになる.
+            </t>
+            <!--
             <t>Impact: The user accesses resources on behalf of the attacker.
             The effective impact depends on the type of resource accessed. For
             example, the user may upload private items to an attacker's
@@ -3716,9 +3730,29 @@
             easily access the victim's data at the client by logging in from
             another device with his credentials at the external Identity
             Provider.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  一連の認可リクエストとアクセストークンを含むリダイレクトレスポンスを紐づけるため, stateパラメーターを用いるべきである.
+                  クライアント自身が開始した認可リクエストに対応するリダイレクトレスポンス以外は受け付けないようにする.
+                  なおstateパラメーターは推測不可能であり, クライアントはその値を秘匿に保つべきである.
+                </t>
+
+                <t>
+                  クライアント開発者およびエンドユーザーに, 信頼できないURLを踏まないように教育する.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>The "state" parameter should be used to link the
                 authorization request with the redirect URI used to deliver
@@ -3731,6 +3765,7 @@
                 <t>Client developers and end users can be educated to not
                 follow untrusted URLs.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Token Substitution (OAuth Login)">
