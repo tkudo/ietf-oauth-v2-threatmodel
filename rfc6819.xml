@@ -3769,12 +3769,26 @@
           </section>
 
           <section title="Threat: Token Substitution (OAuth Login)">
+            <t>
+              アタッカーは被害者のアイデンティティを利用してアプリケーションやWebサイトにログインを試みることがある.
+              OAuthで保護されたAPIから取得したアイデンティティデータを使ってユーザー認証を行うアプリケーションが, この脅威の対象となる.
+              この攻撃パターンは "social login" と呼ばれるシナリオで見受けられる.
+            </t>
+            <!--
             <t>An attacker could attempt to log into an application or web
             site using a victim's identity. Applications relying on identity
             data provided by an OAuth protected service API to login users are
             vulnerable to this threat. This pattern can be found in so-called
             "social login" scenarios.</t>
+            -->
 
+            <t>
+              前提条件として, リソースサーバーがユーザーの個人情報を取得するためのAPIを提供しており, かつその情報を持ってユーザーのアイデンティティが得られたと見なすことができる必要がある.
+              これはつまり, クライアントがリソースサーバーのAPIを "Identity" APIとして扱っているということである.
+              クライアントは, OAuthのアクセストークンを使ってアイデンティティAPIにアクセスし, ユーザーのアイデンティティを取得した後, 自身が内部で持つユーザーアカウントデータ (ログイン情報) から該当ユーザーを特定する.
+              このフローでユーザーの情報を取得できることを根拠として, クライアントは該当ユーザーが認証されたものとして扱う.
+            </t>
+            <!--
             <t>As a prerequisite, a resource server offers an API to obtain
             personal information about a user that could be interpreted as
             having obtained a user identity. In this sense, the client is
@@ -3784,7 +3798,19 @@
             look up its internal user account data (login). The client
             assumes that, because it was able to obtain information about the
             user, the user has been authenticated.</t>
+            -->
 
+            <t>
+              この攻撃では, アタッカーは同じIdentity Providerがターゲットのクライアントに向けて発行した, 被害者の正規のアクセストークンを取得する必要がある.
+              アタッカーが被害者を騙して, ターゲットクライアントのふりをして不正アプリにログインさせるなどが, その方法となる.
+              (この不正アプリはIdentity Providerから見ると, 正規のクライアントのように見える)
+              こうすることで, Identity Providerの認可サーバーは該当Identity Provider用のアクセストークンを発行することになる.
+              それを受け, 不正アプリは得られたアクセストークンをアタッカーに送信し, それをトリガーとしてアタッカーはターゲットアプリのログインフローを開始する.
+              ここでアタッカーは認可レスポンスを改竄し, 自身のアクセストークンの代わりに被害者のアクセストークンをレスポンスに含める.
+              このトークンは, リソースサーバーに関しては正規のaudienceを持つため, アイデンティティAPIで受け入れられる.
+              しかしアイデンティティAPIから返されるユーザー識別子は被害者のものであるため, アタッカーはターゲットアプリに被害者としてログインできてしまう.
+            </t>
+            <!--
             <t>To succeed, the attacker needs to gather a valid access token
             of the respective victim from the same Identity Provider used by
             the target client application. The attacker tricks the victim into
@@ -3802,18 +3828,39 @@
             identity API is determined by the identity in the access token,
             the attacker is logged into the target application under the
             victim's identity.</t>
+            -->
 
+            <t>
+              影響: アタッカーは, そのアプリケーション自体へのアクセス, および被害者がアプリケーション内で持つユーザーデータへのアクセスを取得することになる.
+            </t>
+            <!--
             <t>Impact: The attacker gains access to an application and
             user-specific data within the application.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアントは, OpenID (<xref target="OPENID"></xref>) や SAML (<xref target="OASIS.sstc-saml-bindings-1.1"></xref>) など, ユーザー認証に適切なプロトコルを利用するべきである.
+                  ここであげた2つのプロトコルは, どちらもクライアント上でのaudience制約をサポートする.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Clients should use an appropriate protocol, such as OpenID
                 (cf. <xref target="OPENID"></xref>) or SAML (cf. <xref
                 target="OASIS.sstc-saml-bindings-1.1"></xref>) to implement
                 user login. Both support audience restrictions on clients.</t>
               </list></t>
+            -->
           </section>
         </section>
 
