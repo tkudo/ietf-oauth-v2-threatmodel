@@ -3865,6 +3865,15 @@
         </section>
 
         <section anchor="pwd_flow" title="Resource Owner Password Credentials">
+          <t>
+            リソースオーナーパスワードクレデンシャルグラントタイプ (<xref target="RFC6749"></xref> Section 4.3) は, レガシーシステムからの移行のためなどにしばしば利用される.
+            このグラントタイプでは, クライアントは自身のクレデンシャルの他に, エンドユーザーのIDとパスワードにも直接アクセスし, それらを使ってアクセストークンを取得する.
+            このグラントタイプはUID/パスワードアンチパターンに当てはまるため, 他のグラントタイプより高リスクである.
+            さらに, 認可プロセスはユーザーのコントロール下にないため, このグラントタイプを利用するクライアントはscopeによる制約を受けず, 潜在的にはユーザー自身と同じ権限を持ちうる.
+            (訳注: ID & パスワードを教えた時点でおしまいということ)
+            認可ステップが存在しないため, トークンの無効化機能もバイパスされうる.
+          </t>
+          <!--
           <t>The resource owner password credentials grant type
           (see <xref target="RFC6749"></xref>, Section 4.3), often
           used for legacy/migration reasons, allows a client to request an
@@ -3876,21 +3885,66 @@
           the same capabilities as the user themselves. As there is no
           authorization step, the ability to offer token revocation is
           bypassed.</t>
+          -->
 
+          <t>
+            往々にして2つ以上のサービスで同じパスワードを使うというケースが存在するため, このアンチパターンは提供されたクレデンシャルにアクセス可能ないかなるサービスをもリスクにさらす可能性がある.
+            さらに, 容易に同じ主体であると推測できる情報 (joe@example.com と joe@example.net のペアなど) から, 同じパスワードが違う場所で利用されていることを容易に推測可能なケースもありうる.
+          </t>
+          <!--
           <t>Because passwords are often used for more than 1 service, this
           anti-pattern may also put at risk whatever else is accessible with
           the supplied credential. Additionally, any easily derived equivalent
           (e.g., joe@example.com and joe@example.net) might easily allow
           someone to guess that the same password can be used elsewhere.</t>
+          -->
 
+          <t>
+            影響: リソースサーバーは, 特定のクライアントに紐づけられたアクセストークンベースでしかscopeの区別を付けることができない.
+            クライアントは長期間有効なトークンを取得しアタッカーにそれを送信することもできる.
+            クライアントおよびエンドポイントにいる主体は, ユーザーIDとパスワードを盗聴可能である.
+          </t>
+          <!--
           <t>Impact: The resource server can only differentiate scope based on
           the access token being associated with a particular client. The
           client could also acquire long-lived tokens and pass them up to an
           attacker's web service for further abuse. The client, eavesdroppers,
           or endpoints could eavesdrop the user id and password.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                移行のため以外の目的でこのグラントタイプを利用するのはなるべく避ける.
+              </t>
+
+              <t>
+                認可サーバーはトークンリフレッシュ時に毎回リフレッシュトークンに紐づくクライアントIDを検証すべきである.
+                (<xref target="binding_refresh_client_id"></xref>)
+              </t>
+
+              <t>
+                OAuth Core仕様にあるように, 認可サーバーはTLSのようなトランスポートレイヤーのメカニズムによって通信が保護されていることを保証しなければならない.
+                (<xref target="conf_requests"></xref>)
+              </t>
+
+              <t>
+                各サービスは, ユーザーに複数のサービスで同じパスワードを使うことの危険性を教えるべきである.
+              </t>
+
+              <t>
+                リソースオーナーパスワードクレデンシャルグラントの利用を, 同じ組織が運営するクライアントアプリケーションに限定する.
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Except for migration reasons, minimize use of this grant
               type.</t>
@@ -3912,6 +3966,7 @@
               scenarios where the client application and the authorizing
               service are from the same organization.</t>
             </list></t>
+          -->
 
           <section title="Threat: Accidental Exposure of Passwords at Client Site">
             <t>If the client does not provide enough protection, an attacker
