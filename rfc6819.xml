@@ -3969,12 +3969,38 @@
           -->
 
           <section title="Threat: Accidental Exposure of Passwords at Client Site">
+            <t>
+              クライアントのセキュリティが不十分な場合, アタッカーや内部犯行者がユーザーのパスワードを取得する可能性がある.
+            </t>
+            <!--
             <t>If the client does not provide enough protection, an attacker
             or disgruntled employee could retrieve the passwords for a
             user.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアントがリソースオーナークレデンシャルにアクセスすることのない, 他のフローを利用する.
+                </t>
+
+                <t>
+                  平文でクレデンシャルを扱うのではなく, ダイジェスト認証を利用する.
+                </t>
+
+                <t>
+                  ログに含まれるアクセストークンを解読困難にする.
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Use other flows that do not rely on the client's
                 cooperation for secure resource owner credential handling.</t>
@@ -3984,9 +4010,16 @@
 
                 <t>Obfuscate passwords in logs.</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Client Obtains Scopes without End-User Authorization">
+            <t>
+              すべてのリソースオーナーとのインタラクションは, クライアントによって行われる.
+              よって意図の有無にかかわらず, リソースオーナーが認識しないもしくは意図していなかったscopeを持つトークンが発行される可能性がある.
+              例えば, リソースオーナーが, クライアントはメディアストレージへのread-onlyアクセスのみを必要としていると思ったにも関わらず, クライアントは実際にはフルアクセス権限をリクエストしていた, というようなこともありうる.
+            </t>
+            <!--
             <t>All interaction with the resource owner is performed by the
             client. Thus it might, intentionally or unintentionally, happen
             that the client obtains a token with scope unknown for, or
@@ -3994,9 +4027,35 @@
             might think the client needs and acquires read-only access to its
             media storage only but the client tries to acquire an access token
             with full access permissions.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアントがリソースオーナークレデンシャルにアクセスすることのない, 他のフローを利用する.
+                </t>
+
+                <t>
+                  認可サーバーはこのフローで発行されたアクセストークンのscopeを制限することができる.
+                  (<xref target="limit_scope"></xref>)
+                  もし特定のクライアントが信頼でき, かつセキュアに認証可能な場合は, そのような制約を設けないこともある.
+                  リソースオーナーが事前に (設定画面などで) このフローで取得できるscopeの上限を設定することも検討可能である.
+                </t>
+
+                <t>
+                  認可サーバーは適切な経路 (emailなど) でリソースオーナーにグラント発行通知を送ることもできる.
+                  (<xref target="informed"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Use other flows that do not rely on the client's
                 cooperation for resource owner interaction.</t>
@@ -4013,6 +4072,7 @@
                 an appropriate medium, e.g., email, of the grant issued (see
                 <xref target="informed"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Client Obtains Refresh Token through Automatic Authorization">
