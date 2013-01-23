@@ -4015,8 +4015,7 @@
 
           <section title="Threat: Client Obtains Scopes without End-User Authorization">
             <t>
-              すべてのリソースオーナーとのインタラクションは, クライアントによって行われる.
-              よって意図の有無にかかわらず, リソースオーナーが認識しないもしくは意図していなかったscopeを持つトークンが発行される可能性がある.
+              すべてのリソースオーナーとのインタラクションは, クライアントによって行われるため, 意図の有無にかかわらず, リソースオーナーが認識しないもしくは意図していなかったscopeを持つトークンが発行される可能性がある.
               例えば, リソースオーナーが, クライアントはメディアストレージへのread-onlyアクセスのみを必要としていると思ったにも関わらず, クライアントは実際にはフルアクセス権限をリクエストしていた, というようなこともありうる.
             </t>
             <!--
@@ -4076,13 +4075,43 @@
           </section>
 
           <section title="Threat: Client Obtains Refresh Token through Automatic Authorization">
+            <t>
+              すべてのリソースオーナーとのインタラクションは, クライアントによって行われるため, 意図の有無にかかわらず, リソースオーナーの意思に反してクライアントが長期間有効なリフレッシュトークンを取得する可能性がある.
+            </t>
+            <!--
             <t>All interaction with the resource owner is performed by the
             client. Thus it might, intentionally or unintentionally, happen
             that the client obtains a long-term authorization represented by a
             refresh token even if the resource owner did not intend so.</t>
+            -->
 
+            <t>
+              対抗策:
+            </t>
+            <!--
             <t>Countermeasures:</t>
+            -->
 
+            <t>
+              <list style="symbols">
+                <t>
+                  クライアントがリソースオーナークレデンシャルにアクセスすることのない, 他のフローを利用する.
+                </t>
+
+                <t>
+                  認可サーバーはこのフローではリフレッシュトークンの発行を禁止することもできる.
+                  (<xref target="restricted_refresh"></xref>)
+                  もし特定のクライアントが信頼でき, かつセキュアに認証可能な場合は, そのような制約を設けないこともある.
+                  リソースオーナーに (設定画面などで) このフローでのリフレッシュトークンの発行を禁止させることも検討可能である.
+                </t>
+
+                <t>
+                  認可サーバーは適切な経路 (emailなど) でリソースオーナーにグラント発行通知を送ることもできる.
+                  (<xref target="informed"></xref>)
+                </t>
+              </list>
+            </t>
+            <!--
             <t><list style="symbols">
                 <t>Use other flows that do not rely on the client's
                 cooperation for resource owner interaction.</t>
@@ -4100,6 +4129,7 @@
                 an appropriate medium, e.g., email, of the refresh token issued
                 (see <xref target="informed"></xref>).</t>
               </list></t>
+            -->
           </section>
 
           <section title="Threat: Obtaining User Passwords on Transport">
