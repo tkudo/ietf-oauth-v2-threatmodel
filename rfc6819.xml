@@ -4515,15 +4515,46 @@
 
       <section title="Accessing Protected Resources">
         <section title="Threat: Eavesdropping Access Tokens on Transport">
+          <t>
+            アタッカーがクライアント・リソースサーバー間の通信系路上で有効なアクセストークンを取得する可能性がある.
+            アクセストークンは認可サーバーとリソースサーバーの間で共有されるシークレット情報であるため, 他のクレデンシャル (エンドユーザーパスワードなど) と同じような保護が必要である.
+          </t>
+          <!--
           <t>An attacker could try to obtain a valid access token on transport
           between the client and resource server. As access tokens are shared
           secrets between the authorization server and resource server,
           they should be
           treated with the same care as other credentials (e.g., end-user
           passwords).</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                Bearerトークンとして送信されるアクセストークンは, セキュアでないチャネルで平文で送るべきではない.
+                OAuth Core仕様にあるように, アクセストークン送信時はTLSなどのトランスポートメカニズムによって通信を保護しなければならない.
+                (<xref target="conf_requests"></xref>)
+              </t>
+
+              <t>
+                トークンの有効期限を短くすることで, 漏洩時のリスクを軽減できる.
+                (<xref target="short_exp_time"></xref>)
+              </t>
+
+              <t>
+                アクセストークンをクライアント識別子と紐付け, クライアントにリソースサーバーに対してその所有権を証明させる.
+                (<xref target="authn_requests"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Access tokens sent as bearer tokens should not be sent in
               the clear over an insecure channel. As per the core OAuth spec,
@@ -4539,14 +4570,40 @@
               the resource server (see <xref
               target="authn_requests"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Replay of Authorized Resource Server Requests">
+          <t>
+            アタッカーがユーザーデータを取得/改変/破壊するため, 有効なリクエストをリプレイする可能性がある.
+          </t>
+          <!--
           <t>An attacker could attempt to replay valid requests in order to
           obtain or to modify/destroy user data.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                リソースサーバーはTLSのようなトランスポートレイヤーメカニズムを用いて, この攻撃を防ぐべきである.
+                (<xref target="conf_requests"></xref>)
+                これによりアタッカーは正規のリクエストをキャプチャできなくなる.
+              </t>
+
+              <t>
+                代替策として, リソースサーバーは署名付きリクエスト (<xref target="signed_requests"></xref>) をnonceとtimestampと共に利用し, 各リクエストをユニークに識別することができる.
+                リソースサーバーはこの情報によりリプレイを検知し, リクエストを拒否すべきである.
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>The resource server should utilize transport security
               measures (e.g., TLS) in order to prevent such attacks (see <xref
@@ -4559,17 +4616,52 @@
               The resource server should detect and refuse every replayed
               request.</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Guessing Access Tokens">
+          <t>
+            トークンがhandleの場合, アタッカーは他のアクセストークンから得られる情報を頼りにアクセストークンの値を推測する可能性がある.
+          </t>
+          <!--
           <t>Where the token is a handle, the attacker may attempt to
           guess the access token values based on knowledge they have from
           other access tokens.</t>
+          -->
 
+          <t>
+            影響: 単一ユーザーのデータにアクセスされる.
+          </t>
+          <!--
           <t>Impact: Access to a single user's data.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                handleトークンには十分なエントロピーを持たせ, 有効な値の推測を不可能にするべきである.
+                (<xref target="high_entropy"></xref>)
+              </t>
+
+              <t>
+                assertion (もしくはself-contained) トークンの内容は, 電子署名により保護すべきである.
+                (<xref target="signed_tokens"></xref>)
+              </t>
+
+              <t>
+                アクセストークン有効期限の短縮は, さらにいっそうセキュリティを強化する.
+                (<xref target="exp_time" format="counter"></xref> & <xref target="short_exp_time" format="counter"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Handle tokens should have a reasonable level of entropy
               (see <xref target="high_entropy"></xref>) in order to make
@@ -4582,6 +4674,7 @@
               <t>Security can be further strengthened by using a short access
               token duration (see Sections <xref target="exp_time" format="counter"></xref> and <xref target="short_exp_time" format="counter"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Access Token Phishing by Counterfeit Resource Server">
