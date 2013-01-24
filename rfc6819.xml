@@ -4792,6 +4792,13 @@
         </section>
 
         <section title="Threat: Leak of Confidential Data in HTTP Proxies">
+          <t>
+            <xref target="RFC6749"/> にあるOAuth HTTP認証スキームはオプショナルである.
+            しかしながら, <xref target="RFC2616"></xref> は認証コンテキストの識別のため Authorization および WWW&nbhy;Authenticate ヘッダーに依存し, それによってセキュリティを担保している.
+            特にプロキシやキャッシュなどにより, これらのヘッダーを利用しないリクエストが適切に保護されないケースがありうる.
+            例えば, プライベートな認証コンテキストがパブリックにアクセス可能な状態でキャッシュされるといったことが考えられる.
+          </t>
+          <!--
           <t>An OAuth HTTP authentication scheme as discussed
           in <xref target="RFC6749"/> is optional.
           However, <xref target="RFC2616"></xref> relies on the
@@ -4801,9 +4808,30 @@
           using these headers. For example, private authenticated content may
           be stored in (and thus be retrievable from) publicly accessible
           caches.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                OAuth HTTP認証スキーム (<xref target="authz_header"></xref>) を利用しないクライアントやリソースサーバーは, Cache-Controlヘッダーを使って上記のリスクを最小化すべきである.
+                上記のようなクライアントは, Cache&nbhy;Control ヘッダーに "no-store" <xref target="RFC2616"></xref> をセットすべきである.
+                また上記のようなリソースサーバーは, サクセスレスポンス (2xxステータス) の Cache-Control ヘッダーに "private" <xref target="RFC2616"></xref>をセットすべきである.
+              </t>
+
+              <t>
+                アクセストークンのscopeと有効期限を制限し, 漏洩時のリスクを軽減する.
+                (<xref target="limit_scope"></xref>, <xref target="short_exp_time"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Clients and resource servers not using an OAuth HTTP
               authentication scheme (see <xref target="authz_header"></xref>)
@@ -4820,14 +4848,54 @@
               expiry time (<xref target="short_exp_time"></xref>) for access
               tokens can be used to reduce the damage in case of leaks.</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Token Leakage via Log Files and HTTP Referrers">
+          <t>
+            アクセストークンがURIクエリーパラメータとして送られる場合, トークンがログファイルやHTTPリファラーなどを通じて漏洩する可能性がある.
+          </t>
+          <!--
           <t>If access tokens are sent via URI query parameters, such tokens
           may leak to log files and the HTTP "referer".</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                URI リクエストパラメーターの代わりに Authorization ヘッダーや POST パラメーターを使う.
+                (<xref target="authz_header"></xref>)
+              </t>
+
+              <t>
+                ログ設定を適切に行う.
+              </t>
+
+              <t>
+                ログファイルへのアクセスを適切にコントロールする.
+                (<xref target="std_sys"></xref>)
+              </t>
+
+              <t>
+                漏洩したトークンの利用を防止するため, 認証リクエストを強制することも可能である.
+                (<xref target="authn_requests"></xref>)
+              </t>
+
+              <t>
+                scopeや有効期間を制限することで, 漏洩リスクを軽減する.
+                one-timeトークンを利用するのもよい.
+                (<xref target="limit_scope"></xref>, <xref target="short_exp_time"></xref>, <xref target="one_time_usage"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Use Authorization headers or POST parameters instead of URI
               request parameters (see <xref target="authz_header"></xref>).</t>
@@ -4846,6 +4914,7 @@
               target="short_exp_time"></xref>) and by enforcing one-time token
               usage (see <xref target="one_time_usage"></xref>).</t>
             </list></t>
+          -->
         </section>
       </section>
     </section>
