@@ -4678,14 +4678,54 @@
         </section>
 
         <section title="Threat: Access Token Phishing by Counterfeit Resource Server">
+          <t>
+            アタッカーが特定のリソースサーバーを装って, 特定の認可サーバーから発行されたアクセストークンを受け取る可能性がある.
+            クライアントが有効なアクセストークンをこの偽リソースサーバーに送ると, サーバーはリソースオーナーの認可のもと他のサービスにアクセスできるようになる.
+          </t>
+          <!--
           <t>An attacker may pretend to be a particular resource server and to
           accept tokens from a particular authorization server. If the client
           sends a valid access token to this counterfeit resource server, the
           server in turn may use that token to access other services on behalf
           of the resource owner.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クライアントは, セキュアチャネルの有無に関わらず, 未知のリソースサーバーに対して認証済みリクエストを送るべきでない.
+                リソースサーバーURLがクライアントに対して既知な場合は, セキュアチャネルを利用することでリソースサーバーの認証が可能である.
+                (<xref target="server_authn"></xref>)
+              </t>
+
+              <t>
+                クライアントがアクセスするリソースサーバーのエンドポイントURLを, アクセストークンと関連づけ, 正規のリソースサーバーではその関連を検証する.
+                (audienceフィールドなどを利用)
+                エンドポイントURLのバリデーションポリシーは, 厳密な完全一致でもよいし, ホストのみの一致などのラフな方法でもよい.
+                この手法では, 認可サーバーがリソースサーバーエンドポイントURLを認可プロセス中に知る必要がある.
+              </t>
+
+              <t>
+                アクセストークンをクライアントと関連づけ, リソースサーバーへのリクエスト時にクライアントを認証する.
+                (典型的には, 潜在的アタッカーにシークレットを漏らさないため, 署名を利用する)
+                これにより, 偽サーバーはリソースサーバーに対して正しく認証を行うことができなくなると想定できるので, 攻撃を防ぐことができる.
+                (<xref target="authn_requests"></xref>)
+              </t>
+
+              <t>
+                トークンのscopeを狭めたり, トークンの有効範囲を特定のリソースサーバーに限定するなど.
+                ( <xref target="limit_scope"></xref>, <xref target="bind_token_rs"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Clients should not make authenticated requests with an access
               token to unfamiliar resource servers, regardless of the presence
@@ -4715,19 +4755,40 @@
               certain resource server (<xref
               target="bind_token_rs"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Abuse of Token by Legitimate Resource Server or Client">
+          <t>
+            正規のリソースサーバーが別のリソースサーバーにアクセスしようとする可能性がある.
+            同じように, クライアントもまた取得したトークンを別のリソースサーバーに対して使うこともありうる.
+          </t>
+          <!--
           <t>A legitimate resource server could attempt to use an access token
           to access another resource server. Similarly, a client could try to
           use a token obtained for one server on another resource server.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                トークン有効範囲を特定のリソースサーバーに限定するべきである.
+                (<xref target="bind_token_rs"></xref>)
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Tokens should be restricted to particular resource servers
               (see <xref target="bind_token_rs"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Leak of Confidential Data in HTTP Proxies">
