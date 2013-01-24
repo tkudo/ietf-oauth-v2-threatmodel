@@ -592,7 +592,7 @@
 
         <section title="Scope">
           <t>
-            scopeは, scopeは特定のトークンに紐づき, リソースサーバー, リソース, およびリソースへの操作に関するアクセス認可を示す.
+            scopeは, 特定のトークンに紐づき, リソースサーバー, リソース, およびリソースへの操作に関するアクセス認可を示す.
             scopeは, OAuthにおいてアクセストークンの持つ権限を明示的に示す手段となる.
             scopeは, 認可サーバーとエンドユーザーが, 比較的セキュアでなく信頼度の低いと考えられるOAuthクライアントに対して, リソースへのアクセス権限を制限・制御するために用いられる.
             クライアントは必要に応じてトークンの権限を狭めるためだけにscopeを用いることができる.
@@ -1759,7 +1759,7 @@
           <t>
             <list style="symbols">
               <t>
-                ユーザーに対して要求されたscope (リソースおよびパーミッシュン) についての分かりやすい説明を行う.
+                ユーザーに対して要求されたscope (リソースおよびパーミッション) についての分かりやすい説明を行う.
                 (<xref target="informed_decisions"></xref>)
               </t>
               <t>
@@ -5638,7 +5638,7 @@
           <section anchor="binding_refresh_client_id"
                    title="Binding of Refresh Token to &quot;client_id&quot;">
             <t>
-              認可サーバーは全てのリフレッシュトークンについて、意図している発行先のクライアントの識別子とマッチしているかの確認処理をすべきである.
+              認可サーバーは全てのリフレッシュトークンについて, 意図している発行先のクライアントの識別子とマッチしているかの確認処理をすべきである.
               認可サーバーは同じ "client_id" がアクセストークンのリフレッシュ要求の全てに存在することをチェックすべきである.
               (例えばコンフィデンシャルクライアントのように) 可能な場合, 認可サーバーは各リクエストにおいてクライアントを認証すべきである.
             </t>
@@ -6348,6 +6348,7 @@
               この紐づけは, クライアントが認可コードをアクセストークンに交換しようとした際に, 検証されるべきである.
              攻撃者が認可コードをアクセストークンに交換する際に別のリダイレクトURIを使用することができないため, この方法は偽のウェブサイトへの認可コードの漏洩に対する対抗策となる.
             </t>
+            <!--
             <t>The authorization server should be able to bind every
             authorization "code" to the actual redirect URI used as the
             redirect
@@ -6358,15 +6359,29 @@
             through counterfeit web sites, since an attacker cannot use another
             redirect URI to exchange an authorization "code" into a
             token.</t>
+            -->
           </section>
         </section>
       </section>
 
       <section title="Client App Security">
+        <t>
+          当セクションはクライアントアプリケーションに対するSecurity Considerationsを扱う.
+        </t>
+        <!--
         <t>This section deals with considerations for client applications.</t>
+        -->
 
         <section anchor="cred_software"
                  title="Don't Store Credentials in Code or Resources Bundled with Software Packages">
+          <t>
+            クライアントソフトウェアのコピーは多数作られるため, アプリケーションの全てのインストールで共有される単一のクライアント識別子とシークレットを生成することは, あまりよくない.
+            クライアントシークレットが安全に保持されるとは言えないため, このようなアプリケーションはパブリッククライアントと見なされるだろう.
+            アプリケーションのソースコードや関連のリソースバンドルに埋め込まれたシークレットは, リバースエンジニアリングに対しては無力である.
+            次に, このようなシークレットを無効化すると, そのアプリケーションの全てのインストールが即座に動作しなくなってしまうため, 無効化することができない.
+            さらに, 認可サーバーはクライアント識別子を実際には信用できないため, そのクライアントの信頼性をエンドユーザに示すことは危険だろう.
+          </t>
+          <!--
           <t>Because of the number of copies of client software, there is
           limited benefit in creating a single client id and secret that is
           shared by all installations of an application. Such an application
@@ -6378,21 +6393,38 @@
           out of work. Moreover, since the authorization server cannot really
           trust the client's identifier, it would be dangerous to indicate to
           end users the trustworthiness of the client.</t>
+          -->
         </section>
 
         <section anchor="std_web"
                  title="Use Standard Web Server Protection Measures (for Config Files and Databases)">
+          <t>
+            サーバーやデータベース, 設定ファイル, その他のサーバーの運用に関わるコンポーネントの完全性を保護するために, 標準的なウェブサーバーの保護と設定方法を使うこと.
+          </t>
+          <!--
           <t>Use standard web server protection and configuration measures to
           protect the integrity of the server, databases, configuration files,
           and other operational components of the server.</t>
+          -->
 
         </section>
 
         <section anchor="secure_storage"
                  title="Store Secrets in Secure Storage">
+          <t>
+            あらゆる種類のシークレット (トークン, クライアントシークレット) を安全にデバイスやサーバーに格納する方法は複数存在する.
+          </t>
+          <!--
           <t>There are different ways to store secrets of all kinds (tokens,
           client secrets) securely on a device or server.</t>
+          -->
 
+          <t>
+            ほとんどのマルチユーザーオペレーティングシステムは個々のシステムユーザーの個人ストレージをそれぞれ分離して管理している.
+            さらに, 最近のスマートフォンのオペレーティングシステムのほとんどはファイルシステムの分離された領域にアプリケーション固有のストレージまでも用意され, 他のアプリケーションからアクセスできないようになっている.
+            加えて, アプリケーションはPINやパスワードといったユーザーが提供するシークレットを用いてデータの秘匿性を実現することもできる.
+          </t>
+          <!--
           <t>Most multi-user operating systems segregate the personal storage
           of different system users. Moreover, most modern smartphone
           operating systems even support the storage of application-specific data in
@@ -6400,26 +6432,47 @@
           other applications. Additionally, applications can implement
           confidential data by using a user-supplied secret, such as a
           PIN or password.</t>
+          -->
 
+          <t>
+            別の方法としてリフレッシュトークンを信頼できるバックエンドサーバーに保管する方法が挙げられる.
+            この方法ではクライアントとバックエンドサーバー間の強固な認証機構が必要となる.
+            注: アプリケーションは, 秘匿データがセキュアストレージから読み出された後でも秘匿性を保持したままであることを保証すべきである.
+            これは典型的にはこのデータをアプリケーションのローカルメモリ内で保持することを意味する.
+          </t>
+          <!--
           <t>Another option is to swap refresh token storage to a trusted
           backend server. This option in turn requires a resilient
           authentication mechanism between the client and backend server.
           Note: Applications should ensure that confidential data is kept
           confidential even after reading from secure storage, which typically
           means keeping this data in the local memory of the application.</t>
+          -->
         </section>
 
         <section anchor="device_lock"
                  title="Utilize Device Lock to Prevent Unauthorized Device Access">
+          <t>
+            典型的な最近の電話機では, デバイスを盗難された場合や置き忘れた場合に有用な追加の保護機構を持っている.
+            これらはPINやパスワード, 顔認識のようなその他の生体情報を利用する.
+            これらが提供するセキュリティレベルはそれぞれ同等ではない.
+          </t>
+          <!--
           <t>On a typical modern phone, there are many "device lock" options
           that can be utilized to provide additional protection when a
           device is stolen or misplaced. These include PINs, passwords, and
           other biometric features such as "face recognition". These are not
           equal in the level of security they provide.</t>
+          -->
         </section>
 
         <section anchor="link_state_uasession"
                  title="Link the &quot;state&quot; Parameter to User Agent Session">
+          <t>
+            "state" パラメーターはクライアントに対する複数のリクエスト間を紐づけたり, リダイレクトURIなどに対するCSRF攻撃を防止するために使用される.
+            攻撃者は彼ら自身の認可コードやアクセストークンをインジェクションすることが考えられ, その結果, 被害者のではなく攻撃者の保護リソースに関連づけられたアクセストークンをクライアントに使わせることになる (例えば, 被害者の銀行口座情報を攻撃者の制御下にある保護リソースに保存).
+          </t>
+          <!--
           <t>The "state" parameter is used to link client requests and prevent
           CSRF attacks, for example, attacks against the redirect URI.
           An attacker could inject their own authorization "code" or
@@ -6428,7 +6481,13 @@
           attacker's protected resources rather than the victim's (e.g., save
           the victim's bank account information to a protected resource
           controlled by the attacker).</t>
+          -->
 
+          <t>
+            クライアントは認可リクエストを作成する際, ユーザーエージェントの認証状態をリクエストに紐づけた値  (例えばユーザーエージェントの認証に用いたセッションクッキーのハッシュ) を認可サーバーに送るために "state" リクエストパラメーターを利用すべきである.
+            エンドユーザーの認可が得られた後, 認可サーバーはリクエストに含まれているものと同じ値を持つ "state" パラメーターを付与し, エンドユーザーのユーザーエージェントをクライアントにリダイレクトバックさせる.
+          </t>
+          <!--
           <t>The client should utilize the "state" request parameter to send
           the authorization server a value that binds the request to the
           user agent's authenticated state (e.g., a hash of the session
@@ -6437,10 +6496,16 @@
           the end user, the authorization server redirects the end-user's
           user agent back to the client with the required binding value
           contained in the "state" parameter.</t>
+          -->
 
+          <t>
+            この紐づけられた値とユーザーエージェントの認証状態のマッチングを行うことにより, クライアントはリクエストの妥当性を検証することができる.
+          </t>
+          <!--
           <t>The binding value enables the client to verify the validity of
           the request by matching the binding value to the user agent's
           authenticated state.</t>
+          -->
         </section>
       </section>
 
