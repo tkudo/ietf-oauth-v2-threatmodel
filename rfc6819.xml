@@ -4316,11 +4316,35 @@
 
       <section title="Refreshing an Access Token">
         <section title="Threat: Eavesdropping Refresh Tokens from Authorization Server">
+          <t>
+            アタッカーが認可サーバー・クライアント間の通信を盗聴しリフレッシュトークンを盗み出す可能性がある.
+          </t>
+          <!--
           <t>An attacker may eavesdrop refresh tokens when they are
           transmitted from the authorization server to the client.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                OAuth Core仕様にあるように, 認可サーバーは通信がTLSのようなトランスポートレイヤーメカニズムによって保護されていることを保証しなければならない.
+                (<xref target="conf_requests"></xref>)
+              </t>
+
+              <t>
+                もしend-to-endの機密性が確保できない場合は, 発行するアクセストークンのscopeを狭め有効期限を短くすることで, 漏洩時のリスクを軽減できる.
+                (<xref target="limit_scope"></xref>, <xref target="short_exp_time"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>As per the core OAuth spec, the authorization servers must
               ensure that these transmissions are protected using
@@ -4332,18 +4356,49 @@
               (see <xref target="short_exp_time"></xref>) for issued access
               tokens can be used to reduce the damage in case of leaks.</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Refresh Token from Authorization Server Database">
+          <t>
+            この脅威は, 認可サーバーがリフレッシュトークンをhandleとしてデータベースに保存している場合に起こりうる.
+            アタッカーはデータベースへのアクセス権を不正取得したり, SQLインジェクション攻撃によって, 認可サーバーのデータベースからリフレッシュトークンを取得する可能性がある.
+          </t>
+          <!--
           <t>This threat is applicable if the authorization server stores
           refresh tokens as handles in a database. An attacker may obtain
           refresh tokens from the authorization server's database by gaining
           access to the database or launching a SQL injection attack.</t>
+          -->
 
+          <t>
+            影響: 全リフレッシュトークンの漏洩.
+          </t>
+          <!--
           <t>Impact: Disclosure of all refresh tokens.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                クレデンシャルストレージのベストプラクティスに従う.
+                (<xref target="cred_storage_prot"></xref>)
+              </t>
+
+              <t>
+                アタッカーがクライアントIDとシークレットを盗めないことが想定できる場合は, トークンをクライアントIDと紐付ける.
+                (<xref target="bind_token_client_id"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Enforce credential storage protection best practices
               (<xref target="cred_storage_prot"></xref>).</t>
@@ -4352,18 +4407,58 @@
               required id and secret
               (<xref target="bind_token_client_id"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Obtaining Refresh Token by Online Guessing">
+          <t>
+            アタッカーが有効なリフレッシュトークンの値を推測し, それをrefresh_tokenグラントとして用いてアクセストークンを取得する可能性がある.
+          </t>
+          <!--
           <t>An attacker may try to guess valid refresh token values and send
           it using the grant type &bdquo;refresh_token&ldquo; in
           order to obtain a valid access token.</t>
+          -->
 
+          <t>
+            影響: 単一のリフレッシュトークンおよびそれを使って取得できるアクセストークンの漏洩.
+          </t>
+          <!--
           <t>Impact: Exposure of a single refresh token and derivable access
           tokens.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                handleベースデザインの場合はこちら. (<xref target="high_entropy"></xref>)
+              </t>
+
+              <t>
+                assertionベースデザインの場合はこちら. (<xref target="signed_tokens"></xref>)
+              </t>
+
+              <t>
+                トークンをクライアントIDと紐づける.
+                これによりアタッカーはトークンと紐づいたクライアントIDをも推測しなければならなくなる.
+                (<xref target="bind_token_client_id"></xref>)
+              </t>
+
+              <t>
+                クライアント認証を行う.
+                これによりさらにアタッカーの推測項目が増える.
+                (<xref target="depl_specific_secretes"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>For handle-based designs
               (<xref target="high_entropy"></xref>).</t>
@@ -4379,21 +4474,42 @@
               the attacker has to guess
               (see <xref target="depl_specific_secretes"></xref>).</t>
             </list></t>
+          -->
         </section>
 
         <section title="Threat: Refresh Token Phishing by Counterfeit Authorization Server">
+          <t>
+            アタッカーが認可サーバーへのリクエストをプロキシし, 有効なリフレッシュトークンを取得しようとする可能性がある.
+            認可サーバーURLはクライアント開発時で既知であるか, 少なくとも既知のリソースサーバーから取得できる状態にあることが想定されるため, アタッカーは攻撃のためある程度のスプーフィングを必要とする.
+          </t>
+          <!--
           <t>An attacker could try to obtain valid refresh tokens by proxying
           requests to the authorization server. Given the assumption that the
           authorization server URL is well-known at development time or can at
           least be obtained from a well-known resource server, the attacker
           must utilize some kind of spoofing in order to succeed.</t>
+          -->
 
+          <t>
+            対抗策:
+          </t>
+          <!--
           <t>Countermeasures:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                サーバー認証. (<xref target="server_authn"></xref>)
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>Utilize server authentication
               (as described in <xref target="server_authn"></xref>).</t>
             </list></t>
+          -->
         </section>
       </section>
 
