@@ -6734,25 +6734,64 @@
       </section>
 
       <section title="Resource Servers">
+        <t>
+          以下はリソースサーバーのsecurity considerationsについて詳述する.
+        </t>
+        <!--
         <t>The following section details security considerations for resource
         servers.</t>
+        -->
 
         <section anchor="authz_header" title="Authorization Headers">
+          <t>
+            AuthorizationヘッダーはHTTPプロクシとサーバーによって認識され, 特別に取り扱われる.
+            アクセストークンをリソースサーバーに送るためにそのようなヘッダー, 特にAuthorizationヘッダーを用いることは, 一般に認証されたリクエストの漏洩や意図しない格納の可能性を減らす.
+          </t>
+          <!--
           <t>Authorization headers are recognized and specially treated by
           HTTP proxies and servers. Thus, the usage of such headers for sending
           access tokens to resource servers reduces the likelihood of leakage
           or unintended storage of authenticated requests in general, and
           especially Authorization headers.</t>
+          -->
         </section>
 
         <section anchor="authn_requests" title="Authenticated Requests">
+          <t>
+            認可サーバーはトークンに特定のクライアント識別子を紐づけし, リソースアクセスの際, リソースサーバーによるその紐づけの検証を可能とする.
+            これはリクエストの送信者がトークンの正規のオーナーであるか認証することをリソースサーバーに要求するだろう.
+            この対抗策を実装する方法はいくつかある:
+          </t>
+          <!--
           <t>An authorization server may bind tokens to a certain client
           identifier and enable resource servers to validate that
           association on resource access. This will require the resource
           server to authenticate the originator of a request as the legitimate
           owner of a particular token. There are several options to
           implement this countermeasure:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                認可サーバーはクライアント識別子をトークンに関連づけるかもしれない (内部的に, または自己完結型トークンのペイロード内で).
+                そしてクライアントは自身のアイデンティティを認証するためにリソースサーバーのエンドポイントに対し, クライアント証明書を用いたHTTP認証を行う.
+                そしてリソースサーバーはトークンによって参照されている名前と, 証明書の名前の照合を行う.
+              </t>
+
+              <t>
+                クライアントはリソースサーバーへのリクエストの署名に秘密鍵を用いる (公開鍵はトークン内に格納するか, リクエストとともに送信する).
+              </t>
+
+              <t>
+                認可サーバーはトークンに紐づけられた鍵を発行し, クライアントはトークン使用に対する認証のためのHolder-of-Key証明にその鍵を使用する方法もありうる.
+                リソースサーバーは認可サーバーから直接シークレットを取得するか, シークレットはトークンの暗号化領域に格納されている.
+                この方法ではリソースサーバーはクライアントが誰であるかを知らないが, 認可サーバーがトークンをそのクライアントに対して発行したかどうかを検証することができる.
+              </t>
+            </list>
+            認証されたリクエストは偽のリソースサーバーによるトークンの悪用に対する対抗策となる.
+          </t>
+          <!--
           <t><list style="symbols">
               <t>The authorization server may associate the client identifier
               with the token (either internally or in the payload of a
@@ -6777,32 +6816,96 @@
               token to that client.</t>
             </list>Authenticated requests are a countermeasure against abuse
           of tokens by counterfeit resource servers.</t>
+          -->
         </section>
 
         <section anchor="signed_requests" title="Signed Requests">
+          <t>
+            トランスポートレベルのセキュリティ手法の置き換えや, そのような手法の補完のために, リソースサーバーは署名されたリクエストのみを受け付けるよう決定するかもしれない.
+            全ての署名されたリクエストはユニークに識別できるべきであり, リソースサーバーによって二度処理されることがないようにすべきである.
+            この対抗策は以下についての軽減を助ける:
+          </t>
+          <!--
           <t>A resource server may decide to accept signed requests only,
           either to replace transport-level security measures or to complement
           such measures. Every signed request should be uniquely identifiable
           and should not be processed twice by the resource server. This
           countermeasure helps to mitigate:</t>
+          -->
 
+          <t>
+            <list style="symbols">
+              <t>
+                メッセージの変更
+              </t>
+
+              <t>
+                リプレイの試行
+              </t>
+            </list>
+          </t>
+          <!--
           <t><list style="symbols">
               <t>modifications of the message and</t>
 
               <t>replay attempts</t>
             </list></t>
+          -->
         </section>
       </section>
 
       <section anchor="installed_apps"
                title="A Word on User Interaction and User-Installed Apps">
+        <t>
+          セキュリティプロトコルとしてOAuthは, エンドユーザーをセキュリティモデルの一部とし, 重要なユーザー対話をフロー中に通常含んでいるという点が独特である.
+          これが上記で説明された脅威のいくつかに対する防御の困難さを生み出している.
+          これらの点のうちいくつかは既に説明してきたが, ここでふたたび繰り返して焦点をあてる価値はある.
+        </t>
+        <!--
         <t>OAuth, as a security protocol, is distinctive in that its flow
         usually involves significant user interaction, making the end user a
         part of the security model. This creates some important difficulties
         in defending against some of the threats discussed above. Some of
         these points have already been made, but it's worth repeating and
         highlighting them here.</t>
+        -->
 
+        <t>
+          <list style="symbols">
+            <t>
+              エンドユーザーは何の承認を尋ねられているかを理解しなければならない
+              (<xref target="informed_decisions"></xref> 参照).
+              ユーザーは認可リクエストに対し "yes" と答えることによる悪影響を理解するだけの専門知識を持っていないことも多く, リクエストの言い回しの微妙な違いを理解することができないこともありそうである.
+              悪意のあるソフトウェアはユーザーをだましてほとんどどんなものでも承認させて, ユーザーを混乱させることができる.
+            </t>
+
+            <t>
+              エンドユーザーのデバイスはソフトウェアが脆弱な状態になりがちである.
+              これは, ウェブブラウザやユーザーシステムのその他の部分に対する頻繁な攻撃とともに, 以前からある長期に渡る問題である.
+              ユーザーによってインストールされるアプリの人気が増加するにつれ, 脆弱性や悪意のあるエンドユーザーソフトウェアによりもたらされる脅威は非常に強くなり, 軽減することがとても困難である.
+            </t>
+
+            <t>
+              ユーザーがこのようなアプリのインストールと実行を要求するであろうことと, 脆弱なアプリや悪意のあるアプリはデータの流れの多くのポイントでクレデンシャルを窃取するこができるということに注意すること.
+              それらのアプリはOAuthが設計上保護することになっているユーザーのログインクレデンシャルをインターセプトすることができる.
+              それらのアプリはユーザに理解と承認をさせたものをはるかに超えた認可をリクエストすることができる.
+              それらのアプリは全体のプロセスを隠しながら, ユーザーの代わりにレスポンスを自動的に行うことができる.
+              これらに対する知られた解決方法は存在しないため, ここでは示さない.
+              これはよりよいセキュリティとよりよいユーザビリティの狭間に存在している.
+            </t>
+
+            <t>
+              ユーザーがインストールするソフトウェアの使用を制限することによってこれらの問題を解決することは限られた環境では実用的で, これらのケースに対する対抗策として利用できるかもしれない.
+              このような制約は一般的なケースでは実用的ではなく, 事後のリカバリ方法が用意されるべきである.
+            </t>
+
+            <t>
+              エンドユーザーは自身のデバイスにロードしたアプリケーションに関して適切な審査を行う能力はほとんどないが, 認可サーバーの提供者が悪意のあるクライアントを軽減するために自由に使用できるツールを持つかもしれないない.
+              例えばよい認可サーバーは, 有効に検証できた属性のみをエンドユーザーに主張し, 検証できなかった属性についての明確な指摘とそのクライアントにアクセス権を付与することのリスクを提示を行わなければならない.
+            </t>
+          </list>
+        </t>
+        <!--
         <t><list style="symbols">
             <t>End users must understand what they are being asked to approve
             (see <xref target="informed_decisions"></xref>). Users
@@ -6844,6 +6947,7 @@
             properties it cannot validate, and indicate to the end user the
             risk associated with granting access to the particular client.</t>
           </list></t>
+        -->
       </section>
     </section>
 
